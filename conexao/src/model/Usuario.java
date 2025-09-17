@@ -2,35 +2,54 @@ package model;
 
 public abstract class Usuario {
 	private String nome; 
-	private String urlFoto;
-	private String bio;
+	private String email;
+	private String senha;
+	private String fotoPerfil;
 	
-	
+	//construtor 	
+	Usuario(String nome, String email, String senha, String fotoPerfil) {
+		this.nome = nome;
+		this.email = email;
+		this.senha = senha;
+		this.fotoPerfil = fotoPerfil;
+	}
+
+
 	//getters
 	public String getNome() {
 		return nome;
 	}
 
-	public String getUrlFoto() {
-		return urlFoto;
+	public String getEmail() {
+		return email;
+	}
+
+	public String getSenha() {
+		return senha;
 	}
 	
-	public String getBio() {
-		return bio;
+	public String getFotoPerfil() {
+		return fotoPerfil;
 	}
-	
+
+
 	//setters
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
-	
-	public void setUrlFoto(String urlFoto) {
-		this.urlFoto = urlFoto;
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public void setSenha(String senha) {
+		this.senha = senha;
 	}
 	
-	public void setBio(String bio) {
-		this.bio = bio;
-	} 
+	public void setFotoPerfil(String fotoPerfil) {
+		this.fotoPerfil = fotoPerfil;
+	}
+	
 	
 	
 
