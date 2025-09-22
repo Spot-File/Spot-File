@@ -5,6 +5,7 @@ public class Musica {
 	private String nome;
 	private int duracaoMusica;
 	private Album album;
+
 		
 	Musica(long idMusica, String nome, int duracaoMusica, Album album) {
 		this.idMusica = idMusica;

@@ -78,14 +78,14 @@ FOREIGN KEY (id_musica) REFERENCES musica(id_musica)
 );
 
 -- formato de Inserts
--- INSERT INTO artista (email,senha,nome,about,foto_de_perfil_url) VALUES(); 
--- INSERT INTO ouvinte (email,senha,nome,foto_de_perfil_url) VALUES(); 
--- INSERT INTO album (ano_lancamento,foto_da_capa_url,id_artista) VALUES(); 
--- INSERT INTO musica (nome,duracao,id_album) VALUES(); 
--- INSERT INTO playlist (nome,foto_da_capa_url,bio,tempo_de_streaming,id_ouvinte) VALUES(); 
--- INSERT INTO fans (id_artista,id_ouvinte) VALUES(); 
--- INSERT INTO seguidores (id_seguido,id_seguidor) VALUES(); 
--- INSERT INTO salvo (id_playlist,id_musica) VALUES();
+-- INSERT INTO artista (email,senha,nome,about,foto_de_perfil_url) VALUES(?,?,?,?,?); 
+-- INSERT INTO ouvinte (email,senha,nome,foto_de_perfil_url) VALUES(?,?,?,?); 
+-- INSERT INTO album (ano_lancamento,nome,foto_da_capa_url,id_artista) VALUES(?,?,?,?); 
+-- INSERT INTO musica (nome,duracao,id_album) VALUES(?,?,?); 
+-- INSERT INTO playlist (nome,foto_da_capa_url,bio,tempo_de_streaming,id_ouvinte) VALUES(?,?,?,?,?); 
+-- INSERT INTO fans (id_artista,id_ouvinte) VALUES(?,?); 
+-- INSERT INTO seguidores (id_seguido,id_seguidor) VALUES(?,?); 
+-- INSERT INTO salvo (id_playlist,id_musica) VALUES(?,?);
 
 ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT; -- tinha uns erros de digitação, eu só mexi neles aqui, nao mudei o prompt antigo
 ALTER TABLE musica CHANGE duração duracao SMALLINT NOT NULL;
@@ -102,8 +102,40 @@ ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT;
 -- DELETE FROM salvo WHERE id_musica = ??? AND id_playlist = ???; 
 
 -- formato de ATUALIZAÇÕES
--- cada tabela vai ter uma específica, então vou fazer depois
+-- ARTISTA
+-- UPDATE artista SET nome = ? WHERE id_artista =  ?;
+-- UPDATE artista SET email = ? WHERE id_artista =  ?;
+-- UPDATE artista SET senha = ? WHERE id_artista =  ?;
+-- UPDATE artista SET about = ? WHERE id_artista =  ?;
+-- UPDATE artista SET foto_de_perfil_url = ? WHERE id_artista = ?;
+
+-- OUVINTE
+-- UPDATE ouvinte SET nome = ? WHERE id_ouvinte = ?;
+-- UPDATE ouvinte SET email = ? WHERE id_ouvinte = ?;
+-- UPDATE ouvinte SET senha = ? WHERE id_ouvinte = ?;
+-- UPDATE ouvinte SET foto_de_perfil_url = ? WHERE id_ouvinte = ?;
+
+-- ALBUM
+-- UPDATE album SET nome = ? WHERE id_album = ?;
+-- UPDATE album SET ano_lancamento = ? WHERE id_album = ?;
+-- UPDATE album SET foto_da_capa_url = ? WHERE id_album = ?;
+-- UPDATE album SET tempo_de_streaming = ? WHERE id_album = ?; 
+
+-- MUSICA 
+-- UPDATE musica SET nome = ? WHERE id_musica = ?;
+-- UPDATE musica SET duracao = ? WHERE id_musica = ?;
+-- UPDATE musica SET id_album = ? WHERE id_musica = ?;
+
+-- PLAYLIST
+-- UPDATE playlist SET nome = ? WHERE id_playlist = ?;
+-- UPDATE playlist SET foto_da_capa_url = ? WHERE id_playlist = ?;
+-- UPDATE playlist SET bio = ? WHERE id-playlist = ?;
+-- UPDATE playlist SET tempo_de_streaming = ? WHERE id_playlist = ?;
+-- -- -- no tempoStreaming --> .calcStreaming();
+
+-- RELACIONAMENTOS
+-- Não acho que tenha como fazer um update além de deletar e adicionar.
 
 -- formato de BUSCAS
 -- não sei como funciona ainda
-
+-- não fiz

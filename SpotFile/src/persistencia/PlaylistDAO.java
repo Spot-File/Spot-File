@@ -1,5 +1,60 @@
 package persistencia;
 
-public class PlaylistDAO {
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
+import model.Musica;
+import model.Playlist;
+
+public class PlaylistDAO {
+	private ConexaoMySql conexao;
+
+	public PlaylistDAO() {
+		conexao = new ConexaoMySql();
+	}
+	
+	//Salvando Playlist
+	public void salvar(Playlist playlist) {
+		//abre conexão
+		conexao.abrirConexao();
+		//prompt do bd
+		String sql= "INSERT INTO playlist (nome,foto_da_capa_url,bio,tempo_de_streaming,id_ouvinte) VALUES(?,?,?,?,?)";
+		try {
+			//preparedStatement pega a conexao e "trabalha" no bd com os dados
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			//formatação da string por index de:"?"
+			st.setString(1,playlist.getNome());
+			st.setString(2, playlist.getFotoDaCapaURL());
+			st.setString(3,playlist.getBio());
+			st.setInt(4,playlist.getTempoStreaming());
+			st.setLong(5,playlist.getCriador().getIdOuvinte());
+			//execução no cmd do sql
+			st.executeUpdate(sql);
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally{
+			//fecha conexão
+			conexao.fecharConexao();
+		}
+		
+	}
+	
+	//Adicionando Música na Playlist
+	public void adicionarMusica(Musica musica, Playlist playlist) {
+		conexao.abrirConexao();
+		String sql = "INSERT INTO salvo (id_playlist,id_musica) VALUES(?,?);";
+		try{
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, playlist.getIdPlaylist());
+			st.setLong(2, musica.getIdMusica());
+			st.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		
+	}
+	
+	
 }
