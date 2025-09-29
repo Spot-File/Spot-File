@@ -35,6 +35,73 @@ public class OuvinteDAO {
 		}
 
 	}
+	//EDITAR 
+	public void editar(Ouvinte ouvinte) {
+		// abrir a conexao
+		conexao.abrirConexao();
+		// montar uma String de insert
+		String sql = "UPDATE ouvinte SET nome = ?,email = ?, senha = ?, foto_de_perfil = ? WHERE id_ouvinte = ?;";
+		try {
+			// preparar o update para ser executado
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+
+			st.setString(1, ouvinte.getNome());
+			st.setString(2, ouvinte.getEmail() );
+			st.setString(3, ouvinte.getSenha()  );
+			st.setString(4, ouvinte.getFotoPerfil());
+			st.setInt(5, ouvinte.getIdOuvinte() );
+			
+			// executar essa string de update
+			st.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			// fechar a conexao
+			conexao.fecharConexao();
+		}
+
+	}
+	//EXCLUIR
+		public void excluirPorId(Ouvinte ouvinte) {
+			conexao.abrirConexao();
+			String sql = "DELETE FROM ouvinte WHERE id_ouvinte = ?; DELETE FROM seguidores WHERE id_seguidor = ?;DELETE FROM seguidores WHERE id_seguido = ?;DELETE FROM fans WHERE id_ouvinte = ?;";
+			try {
+				PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+				st.setLong(1, ouvinte.getIdOuvinte());
+				st.setLong(2, ouvinte.getIdOuvinte());
+				st.setLong(3, ouvinte.getIdOuvinte());
+				st.setLong(4, ouvinte.getIdOuvinte());
+				st.executeUpdate();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}finally {
+				conexao.fecharConexao();
+			}
+		}
+		//BUSCAR
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	//Seguir Ouvinte
 	public void seguirOuvinte(Ouvinte seguidor, Ouvinte seguido) {

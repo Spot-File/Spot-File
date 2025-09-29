@@ -1,23 +1,28 @@
 package model;
-import java.util.ArrayList;
+
+import java.util.List;
 
 public abstract class Colecao {
 	
-	private ArrayList<Musica> musicas; 
+	private List<Musica> musicas; 
 	private String fotoDaCapaUrl;
 	private int tempoStreaming;
 	private String nome;
 	
 		
-	Colecao(ArrayList<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome) {
+	Colecao(List<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome) {
 		this.musicas = musicas;
 		this.fotoDaCapaUrl = fotoDaCapaUrl;
 		this.tempoStreaming = tempoStreaming;
 		this.nome = nome;
 	}
-
+	
+	Colecao(){
+		
+	}
+	
 	//getters
-	public ArrayList<Musica> getMusicas() {
+	public List<Musica> getMusicas() {
 		return musicas;
 	}
 	
@@ -34,7 +39,7 @@ public abstract class Colecao {
 	}
 
 	//setters
-	public void setMusicas(ArrayList<Musica> musicas) {
+	public void setMusicas(List<Musica> musicas) {
 		this.musicas = musicas;
 	}
 	

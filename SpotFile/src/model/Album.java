@@ -1,23 +1,26 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Album extends Colecao {
 	private long idAlbum;
 	private int anoLancamento;
-	private String tipo;
-	private Artista criador;
+	private long idArtista;
 	
 
 	
-	Album(ArrayList<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome, long idAlbum,
-			int anoLancamento, String tipo, Artista criador) {
+	public Album(List<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome, long idAlbum,
+			int anoLancamento, long idArtista) {
 		super(musicas, fotoDaCapaUrl, tempoStreaming, nome);
 		this.idAlbum = idAlbum;
 		this.anoLancamento = anoLancamento;
-		this.tipo = tipo;
-		this.criador = criador;
+		this.idArtista = idArtista;
 	}
+	
+	public Album() {
+		super();
+	}
+	
 	//getters
 	public long getIdAlbum() {
 		
@@ -26,13 +29,10 @@ public class Album extends Colecao {
 	public int getAnoLancamento() {
 		return anoLancamento;
 	}
-	public Artista getCriador() {
-		return criador;
+	public long getIdArtista() {
+		return idArtista;
 	}
 	
-	public String getTipo() {
-		return tipo;
-	}
 	
 	//setters
 	public void setIdAlbum(long idAlbum) {
@@ -41,12 +41,9 @@ public class Album extends Colecao {
 	public void setAnoLancamento(int anoLancamento) {
 		this.anoLancamento = anoLancamento;
 	}
-	public void setCriador(Artista criador) {
-		this.criador = criador;
+	public void setidArtista(long idArtista) {
+		this.idArtista = idArtista;
 	} 
-	public void setTipo(String tipo) {
-		this.tipo = tipo;
-	}
 	//métodos 
 	
 	//overwrite 

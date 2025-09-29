@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Ouvinte extends Usuario {
 	
-	private int idOuvinte; //conexão com o banco
+	private long idOuvinte; //conexão com o banco
 	private Playlist playlistFavoritas; //playlist obrigatoria onde vai todas as "liked songs"
 	private ArrayList<Playlist> playlists; 
 	private ArrayList<Ouvinte> followers;
@@ -18,7 +18,7 @@ public class Ouvinte extends Usuario {
 	}
 	
 	//getters
-	public int getIdOuvinte() {
+	public long getIdOuvinte() {
 		return idOuvinte;
 	}
 	
@@ -34,7 +34,7 @@ public class Ouvinte extends Usuario {
 	
 	
 	//setters
-	public void setIdOuvinte(int idOuvinte) {
+	public void setIdOuvinte(long idOuvinte) {
 		this.idOuvinte = idOuvinte;
 	}
 	

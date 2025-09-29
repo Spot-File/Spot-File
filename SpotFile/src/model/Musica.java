@@ -4,14 +4,18 @@ public class Musica {
 	private long idMusica;
 	private String nome;
 	private int duracaoMusica;
-	private Album album;
+	private long idAlbum;
 
 		
-	Musica(long idMusica, String nome, int duracaoMusica, Album album) {
+	public Musica(long idMusica, String nome, int duracaoMusica,long idAlbum) {
 		this.idMusica = idMusica;
 		this.nome = nome;
 		this.duracaoMusica = duracaoMusica;
-		this.album = album;
+		this.idAlbum = idAlbum;
+	}
+	
+	public Musica() {
+		
 	}
 	
 	//getters
@@ -24,8 +28,8 @@ public class Musica {
 	public int getDuracaoMusica() {
 		return duracaoMusica;
 	}
-	public Album getAlbum() {
-		return album;
+	public long getIdAlbum() {
+		return idAlbum;
 	}
 	
 	//setters
@@ -38,8 +42,8 @@ public class Musica {
 	public void setDuracaoMusica(int duracaoMusica) {
 		this.duracaoMusica = duracaoMusica;
 	}
-	public void setAlbum(Album album) {
-		this.album = album;
+	public void setIdAlbum(long idAlbum) {
+		this.idAlbum = idAlbum;
 	}
 
 	

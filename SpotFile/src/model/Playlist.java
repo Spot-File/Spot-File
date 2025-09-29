@@ -5,24 +5,28 @@ import java.util.ArrayList;
 public class Playlist extends Colecao {
 	private long idPlaylist;
 	private String bio; 
-	private Ouvinte criador;
+	private long idOuvinte;
 	
 	Playlist(ArrayList<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome, long idPlaylist,
-			String bio, Ouvinte criador) {
+			String bio, long idOuvinte) {
 		super(musicas, fotoDaCapaUrl, tempoStreaming, nome);
 		this.idPlaylist = idPlaylist;
 		this.bio = bio;
-		this.criador = criador;
+		this.idOuvinte = idOuvinte;
 	}
 	
+	public Playlist() {
+
+	}
+
 	public long getIdPlaylist() {
 		return idPlaylist;
 	}
 	public String getBio() {
 		return bio;
 	}
-	public Ouvinte getCriador() {
-		return criador;
+	public long getIdOuvinte() {
+		return idOuvinte;
 	}
 	
 	
@@ -32,8 +36,8 @@ public class Playlist extends Colecao {
 	public void setBio(String bio) {
 		this.bio = bio;
 	}
-	public void setCriador(Ouvinte criador) {
-		this.criador = criador;
+	public void setIdOuvinte(long idOuvinte) {
+		this.idOuvinte = idOuvinte;
 	}
 	
 	

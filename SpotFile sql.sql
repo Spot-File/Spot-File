@@ -77,7 +77,14 @@ FOREIGN KEY (id_playlist) REFERENCES playlist(id_playlist),
 FOREIGN KEY (id_musica) REFERENCES musica(id_musica)
 );
 
--- formato de Inserts
+ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT; -- tinha uns erros de digitação, eu só mexi neles aqui, nao mudei o prompt antigo
+ALTER TABLE musica CHANGE duração duracao SMALLINT NOT NULL;
+ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT;
+ALTER TABLE playlist CHANGE nome nome VARCHAR(60) DEFAULT "MyPlaylist#0";
+
+SELECT id_musica FROM musica WHERE id_album = ?;
+
+-- formato de INSERTS
 -- INSERT INTO artista (email,senha,nome,about,foto_de_perfil_url) VALUES(?,?,?,?,?); 
 -- INSERT INTO ouvinte (email,senha,nome,foto_de_perfil_url) VALUES(?,?,?,?); 
 -- INSERT INTO album (ano_lancamento,nome,foto_da_capa_url,id_artista) VALUES(?,?,?,?); 
@@ -87,50 +94,31 @@ FOREIGN KEY (id_musica) REFERENCES musica(id_musica)
 -- INSERT INTO seguidores (id_seguido,id_seguidor) VALUES(?,?); 
 -- INSERT INTO salvo (id_playlist,id_musica) VALUES(?,?);
 
-ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT; -- tinha uns erros de digitação, eu só mexi neles aqui, nao mudei o prompt antigo
-ALTER TABLE musica CHANGE duração duracao SMALLINT NOT NULL;
-ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT;
-
 -- formato de EXCLUSÕES
--- DELETE FROM artista WHERE email = ???;
--- DELETE FROM ouvinte WHERE email = ???;
--- DELETE FROM album WHERE id_album = ???;
--- DELETE FROM musica WHERE id_musica = ???;
--- DELETE FROM playlist WHERE id_playlist = ???;
--- DELETE FROM fans WHERE id_ouvinte = ??? AND id_artista = ???;
--- DELETE FROM seguidores WHERE id_seguidor = ??? AND id_seguido = ???;
--- DELETE FROM salvo WHERE id_musica = ??? AND id_playlist = ???; 
+-- DELETE FROM artista WHERE id_artista = ?;
+-- DELETE FROM ouvinte WHERE id_ouvinte = ?;
+-- DELETE FROM album WHERE id_album = ?;
+-- DELETE FROM musica WHERE id_musica = ?;
+-- DELETE FROM playlist WHERE id_playlist = ?;
+-- DELETE FROM fans WHERE id_ouvinte = ? AND id_artista = ?;
+-- DELETE FROM seguidores WHERE id_seguidor = ? AND id_seguido = ?;
+-- DELETE FROM salvo WHERE id_musica = ? AND id_playlist = ?; 
 
 -- formato de ATUALIZAÇÕES
 -- ARTISTA
--- UPDATE artista SET nome = ? WHERE id_artista =  ?;
--- UPDATE artista SET email = ? WHERE id_artista =  ?;
--- UPDATE artista SET senha = ? WHERE id_artista =  ?;
--- UPDATE artista SET about = ? WHERE id_artista =  ?;
--- UPDATE artista SET foto_de_perfil_url = ? WHERE id_artista = ?;
+-- UPDATE artista SET nome = ?, email = ?, senha = ?, about = ?, foto_de_perfil_url = ? WHERE id_artista =  ?;
 
 -- OUVINTE
--- UPDATE ouvinte SET nome = ? WHERE id_ouvinte = ?;
--- UPDATE ouvinte SET email = ? WHERE id_ouvinte = ?;
--- UPDATE ouvinte SET senha = ? WHERE id_ouvinte = ?;
--- UPDATE ouvinte SET foto_de_perfil_url = ? WHERE id_ouvinte = ?;
+-- UPDATE ouvinte SET nome = ?,email = ?, senha = ?, foto_de_perfil = ? WHERE id_ouvinte = ?;
 
 -- ALBUM
--- UPDATE album SET nome = ? WHERE id_album = ?;
--- UPDATE album SET ano_lancamento = ? WHERE id_album = ?;
--- UPDATE album SET foto_da_capa_url = ? WHERE id_album = ?;
--- UPDATE album SET tempo_de_streaming = ? WHERE id_album = ?; 
+-- UPDATE album SET nome = ?, ano_lancamento = ?, foto_da_capa_url = ?, tempo_de_streaming = ? WHERE id_album = ?;
 
 -- MUSICA 
--- UPDATE musica SET nome = ? WHERE id_musica = ?;
--- UPDATE musica SET duracao = ? WHERE id_musica = ?;
--- UPDATE musica SET id_album = ? WHERE id_musica = ?;
+-- UPDATE musica SET nome = ?, duracao = ?, id_album = ? WHERE id_musica = ?;
 
 -- PLAYLIST
--- UPDATE playlist SET nome = ? WHERE id_playlist = ?;
--- UPDATE playlist SET foto_da_capa_url = ? WHERE id_playlist = ?;
--- UPDATE playlist SET bio = ? WHERE id-playlist = ?;
--- UPDATE playlist SET tempo_de_streaming = ? WHERE id_playlist = ?;
+-- UPDATE playlist SET nome = ?,foto_da_capa_url = ?, bio = ?, tempo_de_streaming = ? WHERE id_playlist = ?;
 -- -- -- no tempoStreaming --> .calcStreaming();
 
 -- RELACIONAMENTOS
