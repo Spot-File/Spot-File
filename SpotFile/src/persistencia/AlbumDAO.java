@@ -1,13 +1,14 @@
 package persistencia;
 
+import model.Album;
+import model.Musica;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Album;
-import model.Musica;
 
 public class AlbumDAO {
 	private ConexaoMySql conexao;
@@ -148,6 +149,33 @@ public class AlbumDAO {
 		return albuns;
 	}
 
+	public List<Album> buscarListaAlbunsPorIdArtista(long id_artista){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM album WHERE id_artista = ?;";
+		List<Album> albuns = new ArrayList<Album>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, id_artista);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idAlbum = rs.getLong(1);
+				int anoLancamento = rs.getInt(2);
+				String nome = rs.getString(3);
+				String fotoDaCapa = rs.getString(4);
+				int tempoStreaming = rs.getInt(5);
+				long idArtista = rs.getLong(6);
+				Album album = new Album(buscarMusicasPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
+						anoLancamento, idArtista);
+				albuns.add(album);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		return albuns;
+	}
+	
 	public List<Musica> buscarMusicasPorIdAlbum(long id_album) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM musica WHERE id_album = ?;";
@@ -170,8 +198,9 @@ public class AlbumDAO {
 			conexao.fecharConexao();
 		}
 		return musicas;
-	}// Buscar por Nome Album?
+	}
+	
+	// Buscar por Nome Album?. Dá pra criar um método na apresentação;
 
-	// BUSCAR (todes)
-
+	
 }

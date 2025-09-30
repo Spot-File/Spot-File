@@ -1,18 +1,22 @@
 package persistencia;
+
 import model.Artista;
+import model.Ouvinte;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArtistaDAO {
-private ConexaoMySql conexao;
-	
+	private ConexaoMySql conexao;
+
 	public ArtistaDAO() {
 		conexao = new ConexaoMySql();
 	}
-	
-	//SALVAR 
+
+	// SALVAR
 	public void salvar(Artista artista) {
 		// abrir a conexao
 		conexao.abrirConexao();
@@ -24,7 +28,7 @@ private ConexaoMySql conexao;
 			st.setString(1, artista.getEmail());
 			st.setString(2, artista.getSenha());
 			st.setString(3, artista.getNome());
-			st.setString(4, artista.getAbout());			
+			st.setString(4, artista.getAbout());
 			st.setString(5, artista.getFotoPerfil());
 			// executar essa string de insert
 			st.executeUpdate();
@@ -36,8 +40,8 @@ private ConexaoMySql conexao;
 		}
 
 	}
-	
-	//EDITAR 
+
+	// EDITAR
 	public void editar(Artista artista) {
 		// abrir a conexao
 		conexao.abrirConexao();
@@ -48,9 +52,9 @@ private ConexaoMySql conexao;
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 
 			st.setString(1, artista.getNome());
-			st.setString(2, artista.getEmail() );
-			st.setString(3, artista.getSenha()  );
-			st.setString(4, artista.getAbout() );
+			st.setString(2, artista.getEmail());
+			st.setString(3, artista.getSenha());
+			st.setString(4, artista.getAbout());
 			st.setString(5, artista.getFotoPerfil());
 			st.setLong(6, artista.getIdArtista());
 			// executar essa string de update
@@ -63,21 +67,116 @@ private ConexaoMySql conexao;
 		}
 
 	}
-	//EXCLUIR
-			public void excluirArtistaPorId(Artista artista) {
-				conexao.abrirConexao();
-				String sql = "DELETE FROM artista WHERE id_artista = ?;";
-				try {
-					PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-					st.setLong(1,artista.getIdArtista());
-					st.executeUpdate();
-				}catch(SQLException e) {
-					e.printStackTrace();
-				}finally {
-					conexao.fecharConexao();
-				}
-		
-	    }
-	}
-	//BUSCAR
 
+	// EXCLUIR
+	public void excluirArtistaPorId(Artista artista) {
+		conexao.abrirConexao();
+		String sql = "DELETE FROM artista WHERE id_artista = ?;";
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, artista.getIdArtista());
+			st.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		
+	}
+	
+	
+	// BUSCAR
+	public Artista buscarPorIdArtista(long id_artista) {
+		conexao.abrirConexao();
+		String sql = "SELECT*FROM artista WHERE id_artista = ?;";
+		Artista artista = new Artista();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1,id_artista);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				
+				long idArtista = rs.getLong("id_artista");
+				String email = rs.getString("email");
+				String senha = rs.getString("senha");
+				String nome = rs.getString("nome");
+				String about = rs.getString("about");
+				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				
+				AlbumDAO aDAO = new AlbumDAO();
+				artista.setIdArtista(idArtista);
+				artista.setAbout(about);
+				artista.setEmail(email);
+				artista.setSenha(senha);
+				artista.setNome(nome);
+				artista.setFotoPerfil(fotoPerfil);
+				artista.setAlbuns(aDAO.buscarListaAlbunsPorIdArtista(idArtista));
+				artista.setFans(buscarFans(idArtista));
+				
+				
+			}
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return artista;
+	}
+	
+	public List<Artista> buscarListaArtistas(){
+		conexao.abrirConexao();
+		String sql = "SELECT*FROM artista;";
+		List<Artista> artistas = new ArrayList<Artista>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idArtista = rs.getLong("id_artista");
+				String email = rs.getString("email");
+				String senha = rs.getString("senha");
+				String nome = rs.getString("nome");
+				String about = rs.getString("about");
+				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				
+				AlbumDAO aDAO = new AlbumDAO();
+				Artista artista = new Artista(nome, email, senha, fotoPerfil, idArtista,about,
+						aDAO.buscarListaAlbunsPorIdArtista(idArtista), buscarFans(idArtista));
+				artistas.add(artista);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		return artistas;
+	}
+	
+	public List<Ouvinte> buscarFans(long id_artista){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM fans WHERE id_artista = ?;";
+		List<Ouvinte> fans = new ArrayList<Ouvinte>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, id_artista);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idOuvinte = rs.getLong("id_ouvinte");
+				OuvinteDAO oDAO = new OuvinteDAO();
+				fans.add(oDAO.buscarPorIdOuvinte(idOuvinte));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		return fans;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

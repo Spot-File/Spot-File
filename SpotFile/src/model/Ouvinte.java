@@ -1,15 +1,15 @@
 package model;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Ouvinte extends Usuario {
 	
 	private long idOuvinte; //conexão com o banco
 	private Playlist playlistFavoritas; //playlist obrigatoria onde vai todas as "liked songs"
-	private ArrayList<Playlist> playlists; 
-	private ArrayList<Ouvinte> followers;
+	private List<Playlist> playlists; 
+	private List<Ouvinte> followers;
 	
-	Ouvinte(String nome, String email, String senha, String fotoPerfil, int idOuvinte, Playlist playlistFavoritas,
-			ArrayList<Playlist> playlists, ArrayList<Ouvinte> followers) {
+	public Ouvinte(String nome, String email, String senha, String fotoPerfil, long idOuvinte, Playlist playlistFavoritas,
+			List<Playlist> playlists, List<Ouvinte> followers) {
 		super(nome, email, senha, fotoPerfil);
 		this.idOuvinte = idOuvinte;
 		this.playlistFavoritas = playlistFavoritas;
@@ -17,6 +17,10 @@ public class Ouvinte extends Usuario {
 		this.followers = followers;
 	}
 	
+	public Ouvinte() {
+		super();
+	}
+
 	//getters
 	public long getIdOuvinte() {
 		return idOuvinte;
@@ -25,10 +29,10 @@ public class Ouvinte extends Usuario {
 	public Playlist getPlaylistFavoritas() {
 		return playlistFavoritas;
 	}
-	public ArrayList<Playlist> getPlaylists() {
+	public List<Playlist> getPlaylists() {
 		return playlists;
 	}
-	public ArrayList<Ouvinte> getFollowers() {
+	public List<Ouvinte> getFollowers() {
 		return followers;
 	}
 	
@@ -41,10 +45,10 @@ public class Ouvinte extends Usuario {
 	public void setPlaylistFavoritas(Playlist playlistFavoritas) {
 		this.playlistFavoritas = playlistFavoritas;
 	}
-	public void setPlaylists(ArrayList<Playlist> playlists) {
+	public void setPlaylists(List<Playlist> playlists) {
 		this.playlists = playlists;
 	}
-	public void setFollowers(ArrayList<Ouvinte> followers) {
+	public void setFollowers(List<Ouvinte> followers) {
 		this.followers = followers;
 	} 
 	

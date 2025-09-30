@@ -81,6 +81,7 @@ ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT; -- tin
 ALTER TABLE musica CHANGE duração duracao SMALLINT NOT NULL;
 ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT;
 ALTER TABLE playlist CHANGE nome nome VARCHAR(60) DEFAULT "MyPlaylist#0";
+ALTER TABLE seguidores CHANGE id_seguidores id_seguidor BIGINT NOT NULL;
 
 SELECT id_musica FROM musica WHERE id_album = ?;
 

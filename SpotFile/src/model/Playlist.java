@@ -1,13 +1,13 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Playlist extends Colecao {
 	private long idPlaylist;
 	private String bio; 
 	private long idOuvinte;
 	
-	Playlist(ArrayList<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome, long idPlaylist,
+	public Playlist(List<Musica> musicas, String fotoDaCapaUrl, int tempoStreaming, String nome, long idPlaylist,
 			String bio, long idOuvinte) {
 		super(musicas, fotoDaCapaUrl, tempoStreaming, nome);
 		this.idPlaylist = idPlaylist;

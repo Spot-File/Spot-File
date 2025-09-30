@@ -1,14 +1,14 @@
 package persistencia;
 
+import model.Musica;
+import model.Playlist;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Album;
-import model.Musica;
-import model.Playlist;
 
 public class PlaylistDAO {
 	private ConexaoMySql conexao;
@@ -121,13 +121,87 @@ public class PlaylistDAO {
 		return playlist;
 	}
 
+	public Playlist buscarPlaylistFavoritasIdOuvinte(long id_ouvinte) {
+		conexao.getConexao();
+		String sql = "SELECT * FROM playlist WHERE nome = 'Músicas Favoritas' AND id_ouvinte = ?;";
+		Playlist favorita = new Playlist();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, id_ouvinte);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idPlaylist = rs.getLong("id_playlist");
+				String nome = rs.getString("nome");
+				String fotoCapa = rs.getString("foto_da_capa_url");
+				String bio = rs.getString("bio");
+				int tempoStreaming = rs.getInt("tempo_de_streaming");
+				long idOuvinte = rs.getLong("id_ouvinte");
+			
+				favorita.setIdPlaylist(idPlaylist);
+				favorita.setNome(nome);
+				favorita.setFotoDaCapaURL(fotoCapa);
+				favorita.setBio(bio);
+				favorita.setMusicas(buscarMusicasPorIdPlaylist(idPlaylist));
+				favorita.setTempoStreaming(tempoStreaming);
+				favorita.setIdOuvinte(idOuvinte);
+			}
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return favorita;
+	}
+	
 	public List<Playlist> buscarListaPlaylists(){
-		
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM playlist;";
+		List<Playlist> playlists = new ArrayList<Playlist>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idPlaylist = rs.getLong("id_playlist");
+				String nome = rs.getString("nome");
+				String fotoDaCapa = rs.getString("foto_da_capa_url");
+				String bio = rs.getString("bio");
+				int tempoStreaming = rs.getInt("tempo_de_streaming");
+				long idOuvinte = rs.getLong("id_ouvinte");
+				Playlist playlist = new Playlist(buscarMusicasPorIdPlaylist(idPlaylist),fotoDaCapa,tempoStreaming,nome,idPlaylist,bio,idOuvinte);
+				playlists.add(playlist);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return playlists;
 	}
 
-	public List<Playlist> buscarListaPlaylistPorIdOuvinte(){
-			
-			
+	public List<Playlist> buscarListaPlaylistPorIdOuvinte(long id_ouvinte){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM playlist WHERE id_ouvinte = ?;";
+		List<Playlist> playlists = new ArrayList<Playlist>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, id_ouvinte);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idPlaylist = rs.getLong("id_playlist");
+				String nome = rs.getString("nome");
+				String fotoDaCapa = rs.getString("foto_da_capa_url");
+				String bio = rs.getString("bio");
+				int tempoStreaming = rs.getInt("tempo_de_streaming");
+				long idOuvinte = rs.getLong("id_ouvinte");
+				Playlist playlist = new Playlist(buscarMusicasPorIdPlaylist(idPlaylist),fotoDaCapa,tempoStreaming,nome,idPlaylist,bio,idOuvinte);
+				playlists.add(playlist);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return playlists;
 	}
 	
 	public List<Musica> buscarMusicasPorIdPlaylist(long id_playlist) {
@@ -153,9 +227,6 @@ public class PlaylistDAO {
 		}
 		return musicas;
 	}
-
-	
-	
 	
 	// Adicionando Música na Playlist
 	public void adicionarMusica(Musica musica, Playlist playlist) {
