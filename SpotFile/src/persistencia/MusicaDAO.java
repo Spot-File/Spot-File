@@ -107,7 +107,31 @@ public class MusicaDAO {
 		return musica;
 	}
 
-	public List<Musica> buscarListaMusicas() {
+	public List<Musica> buscarListaMusicaPorNome(String nome){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM musica WHERE nome LIKE ?;";
+		List<Musica> musicas = new ArrayList<Musica>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,"'%"+ nome + "%'");
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idMusica = rs.getLong("id_musica");
+				String nome0 = rs.getString("nome");
+				int duracao = rs.getInt("duracao");
+				long idAlbum = rs.getLong("id_album");
+				Musica musica = new Musica(idMusica, nome0, duracao, idAlbum);
+				musicas.add(musica);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return musicas;
+	}
+	
+	public List<Musica> buscarListaMusica() {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM musica";
 		List<Musica> musicas = new ArrayList<Musica>();

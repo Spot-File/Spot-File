@@ -6,6 +6,7 @@ import model.Musica;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,13 +26,18 @@ public class AlbumDAO {
 		String sql = "INSERT INTO album (ano_lancamento,nome,foto_da_capa_url,id_artista) VALUES(?,?,?,?);";
 		try {
 			// preparar o insert para ser executado
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			st.setInt(1, album.getAnoLancamento());
 			st.setString(2, album.getNome());
 			st.setString(3, album.getFotoDaCapaURL());
 			st.setLong(4, album.getIdArtista());
 			// executar essa string de insert
 			st.executeUpdate();
+			
+			ResultSet rs = st.getGeneratedKeys();
+			if(rs.next()) {
+				album.setIdAlbum(rs.getLong("id_album"));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -68,12 +74,12 @@ public class AlbumDAO {
 	}
 
 	// EXCLUIR
-	public void excluirAlbumPorId(Album album) {
+	public void excluirAlbumPorId(long id_album) {
 		conexao.abrirConexao();
 		String sql = "DELETE FROM album WHERE id_album = ?;";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1, album.getIdAlbum());
+			st.setLong(1,id_album);
 			st.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -109,7 +115,7 @@ public class AlbumDAO {
 				album.setTempoStreaming(tempoStreaming);
 				album.setAnoLancamento(anoLancamento);
 				album.setFotoDaCapaURL(fotoDaCapa);
-				album.setMusicas(buscarMusicasPorIdAlbum(idAlbum));
+				album.setMusicas(buscarListaMusicaPorIdAlbum(idAlbum));
 				album.setidArtista(idArtista);
 
 			}
@@ -123,7 +129,34 @@ public class AlbumDAO {
 	}
 
 	// BUSCAR TODOS (MODELS PRONTOS)
-	public List<Album> buscarListaAlbuns() {
+	public List<Album> buscarListaAlbumPorNome(String nome){
+		conexao.getConexao();
+		String sql = "SELECT * FROM album WHERE nome LIKE ?;";
+		List<Album> albuns = new ArrayList<Album>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,"'%" + nome + "%'");
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idAlbum = rs.getLong(1);
+				int anoLancamento = rs.getInt(2);
+				String nome0 = rs.getString(3);
+				String fotoDaCapa = rs.getString(4);
+				int tempoStreaming = rs.getInt(5);
+				long idArtista = rs.getLong(6);
+				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome0, idAlbum,
+						anoLancamento, idArtista);
+				albuns.add(album);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return albuns;
+	}
+	
+	public List<Album> buscarListaAlbum() {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM album;";
 		List<Album> albuns = new ArrayList<Album>();
@@ -137,7 +170,7 @@ public class AlbumDAO {
 				String fotoDaCapa = rs.getString(4);
 				int tempoStreaming = rs.getInt(5);
 				long idArtista = rs.getLong(6);
-				Album album = new Album(buscarMusicasPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
+				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
 						anoLancamento, idArtista);
 				albuns.add(album);
 			}
@@ -149,7 +182,7 @@ public class AlbumDAO {
 		return albuns;
 	}
 
-	public List<Album> buscarListaAlbunsPorIdArtista(long id_artista){
+	public List<Album> buscarListaAlbumPorIdArtista(long id_artista){
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM album WHERE id_artista = ?;";
 		List<Album> albuns = new ArrayList<Album>();
@@ -164,7 +197,7 @@ public class AlbumDAO {
 				String fotoDaCapa = rs.getString(4);
 				int tempoStreaming = rs.getInt(5);
 				long idArtista = rs.getLong(6);
-				Album album = new Album(buscarMusicasPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
+				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
 						anoLancamento, idArtista);
 				albuns.add(album);
 			}
@@ -176,7 +209,7 @@ public class AlbumDAO {
 		return albuns;
 	}
 	
-	public List<Musica> buscarMusicasPorIdAlbum(long id_album) {
+	public List<Musica> buscarListaMusicaPorIdAlbum(long id_album) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM musica WHERE id_album = ?;";
 		List<Musica> musicas = new ArrayList<Musica>();
@@ -200,7 +233,6 @@ public class AlbumDAO {
 		return musicas;
 	}
 	
-	// Buscar por Nome Album?. Dá pra criar um método na apresentação;
 
 	
 }

@@ -7,6 +7,7 @@ import model.Usuario;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,26 +24,24 @@ public class OuvinteDAO {
 		conexao.abrirConexao();
 		// montar uma String de insert
 		String sql = "INSERT INTO ouvinte (email,senha,nome,foto_de_perfil_url) VALUES(?,?,?,?);";
-		String sql1 = "SELECT id_ouvinte FROM ouvinte WHERE email = ?;";
-		String sql2 = "INSERT INTO playlist (nome,id_ouvinte) VALUES('Músicas Favoritas',?);";
+		String sql1 = "INSERT INTO playlist (nome,id_ouvinte) VALUES('Músicas Favoritas',?);";
 		try {
 			// preparar o insert para ser executado
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, ouvinte.getEmail());
 			st.setString(2, ouvinte.getSenha());
 			st.setString(3, ouvinte.getNome());
 			st.setString(4, ouvinte.getFotoPerfil());
 			// executar essa string de insert
 			st.executeUpdate();
+			ResultSet rs = st.getGeneratedKeys();
+			if(rs.next()) {
+				ouvinte.setIdOuvinte(rs.getLong("id_ouvinte"));
+			}
 
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
-			st1.setString(1, ouvinte.getEmail());
-			ResultSet rs = st1.executeQuery();
-			long idOuvinte = rs.getLong("id_ouvinte");
-
-			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
-			st2.setLong(1, idOuvinte);
-			st2.executeUpdate();
+			st1.setLong(1, ouvinte.getIdOuvinte());
+			st1.executeUpdate();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -132,7 +131,68 @@ public class OuvinteDAO {
 		return ouvinte;
 	}
 
-	public List<Ouvinte> buscarListaOuvintes() {
+	public Ouvinte buscarOuvintePorEmail(String email) {
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM ouvinte WHERE email = ?;";
+		Ouvinte ouvinte = new Ouvinte();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,email);
+			st.executeUpdate();
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idOuvinte = rs.getLong("id_ouvinte");
+				String senha = rs.getString("senha");
+				String nome = rs.getString("nome");
+				String fotoPerfil = rs.getString("foto_de_perfil_url");
+
+				PlaylistDAO pDAO = new PlaylistDAO();
+				ouvinte.setIdOuvinte(idOuvinte);
+				ouvinte.setNome(nome);
+				ouvinte.setEmail(email);
+				ouvinte.setSenha(senha);
+				ouvinte.setFotoPerfil(fotoPerfil);
+				ouvinte.setPlaylistFavoritas(pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte));
+				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));
+				ouvinte.setFollowers(buscarSeguidores(idOuvinte));
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return ouvinte;
+	}
+	
+	public List<Ouvinte> buscarListaOuvintePorNome(String nome){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM ouvinte WHERE nome LIKE ?;";
+		List<Ouvinte> ouvintes = new ArrayList<Ouvinte>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,"'%"+ nome + "%'");
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idOuvinte = rs.getLong("id_ouvinte");
+				String email = rs.getString("email");
+				String senha = rs.getString("senha");
+				String nome0 = rs.getString("nome");
+				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				PlaylistDAO pDAO = new PlaylistDAO();
+				Ouvinte ouvinte = new Ouvinte(nome0, email, senha, fotoPerfil, idOuvinte,
+						pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte),
+						pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte), buscarSeguidores(idOuvinte));
+				ouvintes.add(ouvinte);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		return ouvintes;
+	}
+	
+	public List<Ouvinte> buscarListaOuvinte() {
 		conexao.abrirConexao();
 		String sql = "SELECT*FROM ouvinte;";
 		List<Ouvinte> ouvintes = new ArrayList<Ouvinte>();

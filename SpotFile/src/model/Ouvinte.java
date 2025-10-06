@@ -52,7 +52,15 @@ public class Ouvinte extends Usuario {
 		this.followers = followers;
 	} 
 	
-	
+	/*
+	 * criar
+	 * editar
+	 * excluir 
+	 * buscar
+	 * 
+	 * 
+	 * 
+	 */
 	
 	
 	

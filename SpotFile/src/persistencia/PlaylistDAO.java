@@ -178,6 +178,10 @@ public class PlaylistDAO {
 		return playlists;
 	}
 
+	
+	
+	
+	
 	public List<Playlist> buscarListaPlaylistPorIdOuvinte(long id_ouvinte){
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM playlist WHERE id_ouvinte = ?;";

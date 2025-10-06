@@ -56,4 +56,8 @@ public class Artista extends Usuario {
 		this.fans = fans;
 	}
 
+	
+	
+	
+	
 }
