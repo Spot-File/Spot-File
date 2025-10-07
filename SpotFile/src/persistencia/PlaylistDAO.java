@@ -122,7 +122,7 @@ public class PlaylistDAO {
 	}
 
 	public Playlist buscarPlaylistFavoritasIdOuvinte(long id_ouvinte) {
-		conexao.getConexao();
+		conexao.abrirConexao();
 		String sql = "SELECT * FROM playlist WHERE nome = 'Músicas Favoritas' AND id_ouvinte = ?;";
 		Playlist favorita = new Playlist();
 		try {

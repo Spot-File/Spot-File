@@ -113,7 +113,7 @@ public class MusicaDAO {
 		List<Musica> musicas = new ArrayList<Musica>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"'%"+ nome + "%'");
+			st.setString(1,"%"+ nome + "%");
 			ResultSet rs = st.executeQuery();
 			while(rs.next()) {
 				long idMusica = rs.getLong("id_musica");

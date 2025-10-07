@@ -36,7 +36,7 @@ public class OuvinteDAO {
 			st.executeUpdate();
 			ResultSet rs = st.getGeneratedKeys();
 			if(rs.next()) {
-				ouvinte.setIdOuvinte(rs.getLong("id_ouvinte"));
+				ouvinte.setIdOuvinte(rs.getLong(1));
 			}
 
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
@@ -82,14 +82,28 @@ public class OuvinteDAO {
 	// EXCLUIR
 	public void excluirPorId(Ouvinte ouvinte) {
 		conexao.abrirConexao();
-		String sql = "DELETE FROM ouvinte WHERE id_ouvinte = ?; DELETE FROM seguidores WHERE id_seguidor = ?;DELETE FROM seguidores WHERE id_seguido = ?;DELETE FROM fans WHERE id_ouvinte = ?;";
+		//TROCAR PARA Quatro DELETES
+		String sql = "DELETE FROM fans WHERE id_ouvinte = ?;";
+		String sql1 = "DELETE FROM seguidores WHERE id_seguido = ?;";
+		String sql2 = "DELETE FROM seguidores WHERE id_seguidor = ?;";
+		String sql3 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1, ouvinte.getIdOuvinte());
-			st.setLong(2, ouvinte.getIdOuvinte());
-			st.setLong(3, ouvinte.getIdOuvinte());
-			st.setLong(4, ouvinte.getIdOuvinte());
 			st.executeUpdate();
+			
+			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+			st1.setLong(1, ouvinte.getIdOuvinte());
+			st1.executeUpdate();
+			
+			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
+			st2.setLong(1, ouvinte.getIdOuvinte());
+			st2.executeUpdate();
+			
+			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
+			st3.setLong(1, ouvinte.getIdOuvinte());
+			st3.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -97,6 +111,52 @@ public class OuvinteDAO {
 		}
 	}
 
+	public void excluirPorEmail(String email) {
+		conexao.abrirConexao();
+		String sql = "SELECT id_ouvinte FROM ouvinte WHERE email = ?;";
+		String sql1 = "DELETE FROM playlist WHERE id_ouvinte = ?;";
+		String sql2 = "DELETE FROM fans WHERE id_ouvinte = ?;";
+		String sql3 = "DELETE FROM seguidores WHERE id_seguido = ?;";
+		String sql4 = "DELETE FROM seguidores WHERE id_seguidor = ?;";
+		String sql5 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
+		
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1, email);
+			ResultSet rs = st.executeQuery();
+			long idOuvinte = 0;
+			while(rs.next()) {
+				idOuvinte = rs.getLong(1);
+			}
+			
+			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+			st1.setLong(1, idOuvinte);
+			st1.executeUpdate();
+			
+			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
+			st2.setLong(1, idOuvinte);
+			st2.executeUpdate();
+			
+			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
+			st3.setLong(1, idOuvinte);
+			st3.executeUpdate();
+			
+			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
+			st4.setLong(1, idOuvinte);
+			st4.executeUpdate();
+			
+			PreparedStatement st5 = conexao.getConexao().prepareStatement(sql5);
+			st5.setLong(1, idOuvinte);
+			st5.executeUpdate();
+			
+			
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+	
+	}
 	// BUSCAR
 	public Ouvinte buscarPorIdOuvinte(long id_ouvinte) {
 		conexao.abrirConexao();
@@ -111,7 +171,7 @@ public class OuvinteDAO {
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
 				String nome = rs.getString("nome");
-				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				String fotoPerfil = rs.getString("foto_de_perfil");
 
 				PlaylistDAO pDAO = new PlaylistDAO();
 				ouvinte.setIdOuvinte(idOuvinte);
@@ -138,13 +198,12 @@ public class OuvinteDAO {
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setString(1,email);
-			st.executeUpdate();
 			ResultSet rs = st.executeQuery();
 			while(rs.next()) {
 				long idOuvinte = rs.getLong("id_ouvinte");
 				String senha = rs.getString("senha");
 				String nome = rs.getString("nome");
-				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				String fotoPerfil = rs.getString("foto_de_perfil");
 
 				PlaylistDAO pDAO = new PlaylistDAO();
 				ouvinte.setIdOuvinte(idOuvinte);
@@ -153,7 +212,7 @@ public class OuvinteDAO {
 				ouvinte.setSenha(senha);
 				ouvinte.setFotoPerfil(fotoPerfil);
 				ouvinte.setPlaylistFavoritas(pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte));
-				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));
+				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));conexao.abrirConexao();
 				ouvinte.setFollowers(buscarSeguidores(idOuvinte));
 			}
 		}catch(SQLException e) {
@@ -170,14 +229,14 @@ public class OuvinteDAO {
 		List<Ouvinte> ouvintes = new ArrayList<Ouvinte>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"'%"+ nome + "%'");
+			st.setString(1,"%"+ nome + "%");
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idOuvinte = rs.getLong("id_ouvinte");
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
 				String nome0 = rs.getString("nome");
-				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				String fotoPerfil = rs.getString("foto_de_perfil");
 				PlaylistDAO pDAO = new PlaylistDAO();
 				Ouvinte ouvinte = new Ouvinte(nome0, email, senha, fotoPerfil, idOuvinte,
 						pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte),
@@ -204,7 +263,7 @@ public class OuvinteDAO {
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
 				String nome = rs.getString("nome");
-				String fotoPerfil = rs.getString("foto_de_perfil_url");
+				String fotoPerfil = rs.getString("foto_de_perfil");
 				PlaylistDAO pDAO = new PlaylistDAO();
 				Ouvinte ouvinte = new Ouvinte(nome, email, senha, fotoPerfil, idOuvinte,
 						pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte),

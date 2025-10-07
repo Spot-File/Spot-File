@@ -135,7 +135,7 @@ public class AlbumDAO {
 		List<Album> albuns = new ArrayList<Album>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"'%" + nome + "%'");
+			st.setString(1,"%" + nome + "%");
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idAlbum = rs.getLong(1);
@@ -182,32 +182,7 @@ public class AlbumDAO {
 		return albuns;
 	}
 
-	public List<Album> buscarListaAlbumPorIdArtista(long id_artista){
-		conexao.abrirConexao();
-		String sql = "SELECT * FROM album WHERE id_artista = ?;";
-		List<Album> albuns = new ArrayList<Album>();
-		try {
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1, id_artista);
-			ResultSet rs = st.executeQuery();
-			while (rs.next()) {
-				long idAlbum = rs.getLong(1);
-				int anoLancamento = rs.getInt(2);
-				String nome = rs.getString(3);
-				String fotoDaCapa = rs.getString(4);
-				int tempoStreaming = rs.getInt(5);
-				long idArtista = rs.getLong(6);
-				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
-						anoLancamento, idArtista);
-				albuns.add(album);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			conexao.fecharConexao();
-		}
-		return albuns;
-	}
+	
 	
 	public List<Musica> buscarListaMusicaPorIdAlbum(long id_album) {
 		conexao.abrirConexao();
