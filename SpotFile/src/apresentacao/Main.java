@@ -16,7 +16,7 @@ public class Main {
 	 private static  AlbumDAO albumDAO = new AlbumDAO(); 
 	 private static  ArtistaDAO artistaDAO = new ArtistaDAO(); 
 	 private static  OuvinteDAO ouvinteDAO = new OuvinteDAO(); 
-	 private static  PlaylistDAO playlistAO = new PlaylistDAO(); 
+	 private static  PlaylistDAO playlistDAO = new PlaylistDAO(); 
 	 private static  MusicaDAO musicaDAO = new MusicaDAO(); 
 	 
 	 // logins 
@@ -35,6 +35,7 @@ public class Main {
             System.out.println("0) Sair");
             System.out.print("Escolha: ");
              escolha = scanner.nextInt(); 
+            scanner.nextLine(); // consome o enter
             
             switch(escolha) {
             case 1: 
@@ -54,13 +55,16 @@ public class Main {
 		
 		
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//artista 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void escolhaArtista() { 
 		System.out.println("--ARTISTA--"); 
 		System.out.println("1)Cadastrar (criar conta)"); 
 		System.out.println("2)Entrar (já tem conta)"); 
 		System.out.println("0)Voltar"); 
 		int escolhaArtista = scanner.nextInt(); 
+		scanner.nextLine(); // consome o enter
 		
 		switch(escolhaArtista) { 
 		case 1: 
@@ -78,22 +82,22 @@ public class Main {
 		}
 		
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void cadastrarArtista() { 
 		//pede NOME
 		System.out.println("Nome: "); 
 		String nomeArtista = scanner.nextLine(); 
 		//PEDE EMAIL
 		System.out.println("Email: "); 
-		String emailArtista = scanner.next();
+		String emailArtista = scanner.nextLine();
 		//CRIA AS SENHAS PARA FAZER A VERIFICAÇÃO
 		String senhaArtista ="1"; 
 		String senhaArtista2 = "2"; 
 		do { 
 			System.out.println("Senha: "); 
-			 senhaArtista = scanner.next(); 
+			 senhaArtista = scanner.nextLine(); 
 			System.out.println("Repita a senha: "); 
-			 senhaArtista2 = scanner.next(); 
+			 senhaArtista2 = scanner.nextLine(); 
 			
 			if (senhaArtista.equals(senhaArtista2)) {
 				System.out.println("Senha verificada com sucesso!"); 
@@ -103,10 +107,7 @@ public class Main {
 		} while (!senhaArtista.equals(senhaArtista2)); 
 		// PEDE A URL DA FOTO DE PERFIL
 		System.out.println("Insira URL da foto de perfil:"); 
-		String URLFotoArtista = scanner.next(); 
-		// VER ID
-		System.out.println("VER ESSE NGC: INSERIR ID?? COMO ASSIMMM");
-		long idArtista = scanner.nextLong(); 
+		String URLFotoArtista = scanner.nextLine(); 
 		// PEDE ABOUT
 		System.out.println("Inserir ABOUT:"); 
 		String about = scanner.nextLine(); 
@@ -120,7 +121,6 @@ public class Main {
 		a.setEmail(emailArtista);
 		a.setSenha(senhaArtista);
 		a.setFotoPerfil(URLFotoArtista);
-		a.setIdArtista(idArtista);
 		a.setAbout(about);
 		a.setFans(fans);
 		a.setAlbuns(albuns);
@@ -135,7 +135,7 @@ public class Main {
         }
 		
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void verificarArtista() {
 		System.out.print("E-mail: ");
         String emailArtista = scanner.nextLine();
@@ -146,17 +146,264 @@ public class Main {
         
 		
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void menuArtista () { 
+		System.out.println("========MENU ARTISTA========="); 
+		System.out.println("1)CRIAR ÁLBUM");
+		System.out.println("2)LISTAR ÁLBUNS - apenas");
+		System.out.println("3)LISTAR ÁLBUNS & MÚSICAS");
+		System.out.println("4)ATUALIZAR ÁLBUM");
+		System.out.println("5)ATUALIZAR MÚSICA");
+		System.out.println("6)ATUALIZAR PERFIL");
+		System.out.println("7)DELETAR ÁLBUM");
+		System.out.println("8)DELETAR MÚSICA");
+		System.out.println("9)DELETAR CONTA");
+		int escolhaMenuArtista = scanner.nextInt(); 
+		scanner.nextLine(); // consome o enter
+		
+		switch(escolhaMenuArtista){ 
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 1: //CRIAR ÁLBUM e UPAR MUSICAS
+				
+				//criando album
+				//LISTA DE MUSICAS VAZIAS
+				List<Musica> musicasAlbum = new ArrayList(); 
+				//NOME DO ALBUM
+				System.out.println("Criando o álbum!!Yay"); 
+				System.out.println("Nome:");
+				String nomeAlbum = scanner.nextLine(); 
+				// CAPA 
+				System.out.println("Foto da Capa (URL):");
+				String URLcapaAlbum = scanner.nextLine();
+				//ver...ANO DE LANÇAMENTO TIMESTAMP? 
+				System.out.println("Ano de lançamento?");
+				int anoDeLancamento = scanner.nextInt(); 
+				scanner.nextLine(); // consome o enter
+				//id artista 
+				long idArtistaCriador = artistaLogado.getIdArtista(); 
+				
+				Album album = new Album(); 
+				album.setNome(nomeAlbum); 
+				album.setFotoDaCapaURL(URLcapaAlbum); 
+				album.setMusicas(musicasAlbum); 
+				album.setidArtista(idArtistaCriador);
+				album.setAnoLancamento(anoDeLancamento); 
+					
+				//criando e upando musicas
+				System.out.println("Criando as músicas!!Yay"); 
+				int escolhaMusica = 5; 
+				String nomeMusica; 
+				int duracaoMusica; 
+				long idAlbumDaMusica = album.getIdAlbum(); 
+				int tempoStreaming = 0; //em segundos
+				do {
+					System.out.println("Nome: "); 
+					nomeMusica = scanner.nextLine(); 
+					System.out.println("Duração da música (em segundos):");
+					duracaoMusica = scanner.nextInt(); 
+					scanner.nextLine(); // consome o enter
+					
+					Musica musica = new Musica(); 
+					musica.setDuracaoMusica(duracaoMusica); 
+					musica.setNome(nomeMusica); 
+					musica.setIdAlbum(idAlbumDaMusica); 
+					
+					try {
+						musicaDAO.salvar(musica); 
+						System.out.println("Música cadastrada com suceeso! Diga oiê a sua nova música,  " + musica.getNome()); 
+					} catch (Exception e) {
+						System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
+			        }
+					
+					musicasAlbum.add(musica);
+					//transforma o tempo de streaming do album na soma das durações das musicas
+					tempoStreaming +=  duracaoMusica; 
+					
+					
+		
+					System.out.println("Upar nova música? Sim(1) / Não(0)"); 
+						escolhaMusica =scanner.nextInt(); 
+						scanner.nextLine(); // consome o enter
+				}while (escolhaMusica != 0); 
+				//adciona o tempo de streaming feito aqui nas musicas upadas
+				album.setTempoStreaming(tempoStreaming); 
+				
+				//salva no bd
+				try {
+					albumDAO.salvar(album); 
+					System.out.println("Álbum cadastrado com suceeso! Diga olá ao seu novo álbum,  " + album.getNome()); 
+				} catch (Exception e) {
+					System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
+		        }
+				
+				//adiciona álbum criado com as músicas upadas ja no artista. 
+				artistaLogado.getAlbuns().add(album); 
+				
+				
+				
+				
+				break; 
+				
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 2: //LISTAR ÁLBUNS - apenas
+				//for que percorre todos os álbuns do artista
+				for(int i =0; i< artistaLogado.getAlbuns().size(); i++) {
+					System.out.println("=====SEUS ÁLBUNS=====");
+					System.out.println(artistaLogado.getAlbuns().get(i).getNome());
+					System.out.println(artistaLogado.getAlbuns().get(i).printarInfos());
+					System.out.println(artistaLogado.getAlbuns().get(i).getAnoLancamento());
+					//BUSCAS O NOME DO ARTISTA PELO ID NO BANCO
+					System.out.println(artistaDAO.buscarPorIdArtista(artistaLogado.getAlbuns().get(i).getIdArtista()).getNome());		
+				}
+				
+				
+				break; 
+			case 3: //LISTAR ÁLBUNS & MÚSICAS
+				//for que percorre todos os álbuns do artista
+				for(int i =0; i< artistaLogado.getAlbuns().size(); i++) {
+					System.out.println("=====SEUS ÁLBUNS=====");
+					System.out.println(artistaLogado.getAlbuns().get(i).getNome());
+					System.out.println(artistaLogado.getAlbuns().get(i).printarInfos());
+					System.out.println(artistaLogado.getAlbuns().get(i).getAnoLancamento());
+					//BUSCAS O NOME DO ARTISTA PELO ID NO BANCO
+					System.out.println(artistaDAO.buscarPorIdArtista(artistaLogado.getAlbuns().get(i).getIdArtista()).getNome());
+					//for que percorre todas as musicas dentro do album
+					for(int j =0; j< artistaLogado.getAlbuns().get(i).getMusicas().size(); j++) {
+						System.out.println(artistaLogado.getAlbuns().get(i).getMusicas().get(j).getNome());
+						System.out.println(artistaLogado.getAlbuns().get(i).getMusicas().get(j).getDuracaoMusica());
+						//PRINT DE NOVO O NOME DO ARTISTA PQ EH ASSIM NO SPOTIFY
+						System.out.println(artistaDAO.buscarPorIdArtista(artistaLogado.getAlbuns().get(i).getIdArtista()).getNome());
+						
+					}
+				}
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+				
+			case 4: //ATUALIZAR ÁLBUM
+				
+				int escolhaAtualizacao = 5; 
+				do { 
+					System.out.println("Qual o nome do seu álbum que deseja editar?"); 
+					String nomeAlbumEditar = scanner.nextLine(); 
+					//essa lista vai ter so um retorno ENTAO PODERIA SER SO ALBUM (MUDAR DAO) 
+					List<Album> albunsPuxados = albumDAO.buscarListaAlbumPorNome(nomeAlbumEditar);
+					if (albunsPuxados == null || albunsPuxados.isEmpty()) {
+					    System.out.println("Nenhum álbum encontrado com esse nome.");
+					    break; // VE SE EXISTE MESMO ALBUNS COM ESSE NOME
+					}
+					Album albumProcurado = albunsPuxados.get(0);
+					int escolhaDeAtributo = 5; 
+					do { 
+						System.out.println("O que desejas editar?"); 
+						System.out.println("1)Nome");
+						System.out.println("2)Capa do Álbum (inserir URL)");
+						System.out.println("3)Ano de lançamento");
+						System.out.println("4)Quero alterar as musicas dentro do álbum");
+						System.out.println("0)Voltar"); 
+						escolhaDeAtributo = scanner.nextInt(); 
+						scanner.nextLine(); // consome o enter
+						
+						switch(escolhaDeAtributo) { 
+						////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						case 1: //MUDANDO NOME 
+							System.out.println("Insira o novo nome do álbum:"); 
+							String novoNome = scanner.nextLine(); 
+							albumProcurado.setNome(novoNome); 
+							
+							try {
+								albumDAO.editar(albumProcurado); 
+								
+							} catch(Exception e) {
+								System.out.println("Erro ao mudar nome do álbum: " + e.getMessage());
+					        }
+
+							break; 
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						case 2: //MUDANDO CAPA
+							System.out.println("Insira o novo URL da capa do álbum:"); 
+							String novaCapaURL = scanner.nextLine(); 
+							albumProcurado.setFotoDaCapaURL(novaCapaURL); 
+							
+							try {
+								albumDAO.editar(albumProcurado); 
+								
+							} catch(Exception e) {
+								System.out.println("Erro ao mudar capa do álbum: " + e.getMessage());
+					        }
+
+							break; 
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						case 3: //MUDANDO ANO DE LANÇAMENTO 
+							System.out.println("Insira o novo ano de lançamento:"); 
+							int novoAnoDeLancamento = scanner.nextInt(); 
+							scanner.nextLine(); 
+							albumProcurado.setAnoLancamento(novoAnoDeLancamento); 
+							
+							try {
+								albumDAO.editar(albumProcurado); 
+								
+							} catch(Exception e) {
+								System.out.println("Erro ao mudar capa do álbum: " + e.getMessage());
+					        }
+
+							break;
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						case 4: //IR PARA MUDAR MUSICA 
+							break; 
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+						case 0: //VOLTAR PARA MENU
+							System.out.println("Voltando...");
+							break; 
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						default: 
+							System.out.println("Escolha não existe. Tente de novo."); 
+							
+							break; 
+						}
+					}while (escolhaDeAtributo !=0);
+					
+					
+					
+				}while(escolhaAtualizacao!=0);
+				
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 5: //ATUALIZAR MÚSICA
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 6: //ATUALIZAR PERFIL
+				
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 7: //DELETAR ÁLBUM
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 8: //DELETAR MÚSICA
+				break; 
+			case 9: //DELETAR CONTA
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			default:
+				
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		}
+		
 		
 	}
-	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//ouvinte
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void escolhaOuvinte() { 
 		System.out.println("--OUVINTE--"); 
 		System.out.println("1)Cadastrar (criar conta)"); 
 		System.out.println("2)Entrar (já tem conta)"); 
 		System.out.println("0)Voltar"); 
 		int escolhaOuvinte = scanner.nextInt(); 
+		scanner.nextLine(); // consome o enter
 		
 		switch(escolhaOuvinte) { 
 		case 1: 
@@ -176,20 +423,20 @@ public class Main {
 		
 	}
 	
-	public static void cadastrarOuvinte () { 
+	public static void cadastrarOuvinte(){ 
 		System.out.println("Nome: "); 
 		String nomeOuvinte = scanner.nextLine(); 
 		//PEDE EMAIL
 		System.out.println("Email: "); 
-		String emailOuvinte = scanner.next();
+		String emailOuvinte = scanner.nextLine();
 		//CRIA AS SENHAS PARA FAZER A VERIFICAÇÃO
 		String senhaOuvinte ="1"; 
 		String senhaOuvinte2 = "2"; 
 		do { 
 			System.out.println("Senha: "); 
-			senhaOuvinte = scanner.next(); 
+			senhaOuvinte = scanner.nextLine(); 
 			System.out.println("Repita a senha: "); 
-			senhaOuvinte2 = scanner.next(); 
+			senhaOuvinte2 = scanner.nextLine(); 
 			
 			if (senhaOuvinte.equals(senhaOuvinte2)) {
 				System.out.println("Senha verificada com sucesso!"); 
@@ -199,10 +446,7 @@ public class Main {
 		} while (!senhaOuvinte.equals(senhaOuvinte2)); 
 		// PEDE A URL DA FOTO DE PERFIL
 		System.out.println("Insira URL da foto de perfil:"); 
-		String URLFotoOuvinte = scanner.next(); 
-		// VER ID
-		System.out.println("VER ESSE NGC: INSERIR ID?? COMO ASSIMMM");
-		long idOuvinte = scanner.nextLong(); 
+		String URLFotoOuvinte = scanner.nextLine(); 
 		//CRIA A LISTA DE PLAYLISTS VAZIA
 		List<Playlist> playlists = new ArrayList(); 
 		//CRIA A LISTA DE SEGUIDORES VAZIA
@@ -216,7 +460,6 @@ public class Main {
 		o.setEmail(emailOuvinte);
 		o.setSenha(senhaOuvinte);
 		o.setFotoPerfil(URLFotoOuvinte);
-		o.setIdOuvinte(idOuvinte);
 		o.setPlaylists(playlists);
 		o.setFollowers(seguidores);
 		o.setPlaylistFavoritas(playlistFavoritas);
@@ -242,9 +485,15 @@ public class Main {
         String senhaOuvinte = scanner.nextLine();
         
         // Ouvinte o = ouvinteDAO.buscarPorEMAIL!!! 
+        //verficar a senha 
 		
 	}
+	
+
 	public static void menuOuvinte() {
+		
+		
+		
 		
 	}
 
