@@ -77,13 +77,17 @@ FOREIGN KEY (id_playlist) REFERENCES playlist(id_playlist),
 FOREIGN KEY (id_musica) REFERENCES musica(id_musica)
 );
 
-ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT; -- tinha uns erros de digitação, eu só mexi neles aqui, nao mudei o prompt antigo
+ALTER TABLE album CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT DEFAULT(0); -- tinha uns erros de digitação, eu só mexi neles aqui, nao mudei o prompt antigo
 ALTER TABLE musica CHANGE duração duracao SMALLINT NOT NULL;
-ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT;
+ALTER TABLE playlist CHANGE tempo_de_streaming tempo_de_streaming MEDIUMINT DEFAULT(0);
 ALTER TABLE playlist CHANGE nome nome VARCHAR(60) DEFAULT "MyPlaylist#0";
 ALTER TABLE seguidores CHANGE id_seguidores id_seguidor BIGINT NOT NULL;
+ALTER TABLE ouvinte CHANGE foto_de_perfil_url foto_de_perfil TEXT;
+ALTER TABLE artista CHANGE foto_de_perfil_url foto_de_perfil TEXT;
 
 SELECT id_musica FROM musica WHERE id_album = ?;
+SELECT * FROM ouvinte WHERE nome LIKE '%A%';
+SELECT * FROM playlist;
 
 -- formato de INSERTS
 -- INSERT INTO artista (email,senha,nome,about,foto_de_perfil_url) VALUES(?,?,?,?,?); 
