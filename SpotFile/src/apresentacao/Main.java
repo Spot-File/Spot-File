@@ -140,11 +140,28 @@ public class Main {
 		System.out.print("E-mail: ");
         String emailArtista = scanner.nextLine();
         System.out.print("Senha: ");
-        String senhaArtista = scanner.nextLine();
+        String senhaLogin = scanner.nextLine();
         
-       // Artista a = artistaDAO.buscarPorEMAIL!!! 
-        
-		
+        Artista artistaProcurado = artistaDAO.buscarArtistaPorEmail(emailArtista); 
+        String senhaBD;
+        System.out.println(artistaProcurado.getIdArtista());
+        do { 		
+			if (artistaProcurado.getEmail().equals(emailArtista)&&artistaProcurado.getSenha()!=null) {
+				System.out.println("Artista encontrado! "); 
+				 senhaBD = artistaProcurado.getSenha();
+				  do { 	
+					  	
+						if (senhaLogin.equals(senhaBD)) {
+							System.out.println("Senha verificada com sucesso!"); 
+						} else { 
+							System.out.println("As duas senhas são diferentes. Tente novamente.");
+						}
+					} while (!senhaLogin.equals(senhaBD)); 
+			        	
+			} else { 
+				System.out.println("Não existe artista cadastrado com esse email. Verifique email e tente novamente.");
+			}
+		} while (artistaProcurado.getEmail().equals(null)); 	
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void menuArtista () { 
@@ -188,6 +205,14 @@ public class Main {
 				album.setMusicas(musicasAlbum); 
 				album.setidArtista(idArtistaCriador);
 				album.setAnoLancamento(anoDeLancamento); 
+				
+				//salva no bd
+				try {
+					albumDAO.salvar(album); 
+					System.out.println("Álbum cadastrado com suceeso! Diga olá ao seu novo álbum,  " + album.getNome()); 
+				} catch (Exception e) {
+					System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
+		        }
 					
 				//criando e upando musicas
 				System.out.println("Criando as músicas!!Yay"); 
@@ -228,18 +253,12 @@ public class Main {
 				//adciona o tempo de streaming feito aqui nas musicas upadas
 				album.setTempoStreaming(tempoStreaming); 
 				
-				//salva no bd
-				try {
-					albumDAO.salvar(album); 
-					System.out.println("Álbum cadastrado com suceeso! Diga olá ao seu novo álbum,  " + album.getNome()); 
-				} catch (Exception e) {
-					System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
-		        }
+
 				
 				//adiciona álbum criado com as músicas upadas ja no artista. 
 				artistaLogado.getAlbuns().add(album); 
 				
-				
+				menuArtista(); 
 				
 				
 				break; 
