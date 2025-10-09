@@ -161,7 +161,12 @@ public class Main {
 			} else { 
 				System.out.println("Não existe artista cadastrado com esse email. Verifique email e tente novamente.");
 			}
-		} while (artistaProcurado.getEmail().equals(null)); 	
+		} while (artistaProcurado.getEmail().equals(null)); 
+   
+        artistaLogado = artistaProcurado; 
+        
+     
+        
 	}
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void menuArtista () { 
@@ -258,7 +263,8 @@ public class Main {
 				//adiciona álbum criado com as músicas upadas ja no artista. 
 				artistaLogado.getAlbuns().add(album); 
 				
-				menuArtista(); 
+				//volta para o menu
+				menuArtista();
 				
 				
 				break; 
@@ -275,7 +281,8 @@ public class Main {
 					System.out.println(artistaDAO.buscarPorIdArtista(artistaLogado.getAlbuns().get(i).getIdArtista()).getNome());		
 				}
 				
-				
+				//volta para o menu
+				menuArtista();
 				break; 
 			case 3: //LISTAR ÁLBUNS & MÚSICAS
 				//for que percorre todos os álbuns do artista
@@ -295,117 +302,389 @@ public class Main {
 						
 					}
 				}
+				//volta para o menu
+				menuArtista();
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 				
 			case 4: //ATUALIZAR ÁLBUM
 				
-				int escolhaAtualizacao = 5; 
-				do { 
 					System.out.println("Qual o nome do seu álbum que deseja editar?"); 
 					String nomeAlbumEditar = scanner.nextLine(); 
 					//essa lista vai ter so um retorno ENTAO PODERIA SER SO ALBUM (MUDAR DAO) 
 					List<Album> albunsPuxados = albumDAO.buscarListaAlbumPorNome(nomeAlbumEditar);
-					if (albunsPuxados == null || albunsPuxados.isEmpty()) {
+					if (albunsPuxados.get(0) == null) {
 					    System.out.println("Nenhum álbum encontrado com esse nome.");
 					    break; // VE SE EXISTE MESMO ALBUNS COM ESSE NOME
 					}
 					Album albumProcurado = albunsPuxados.get(0);
 					int escolhaDeAtributo = 5; 
+					//verificando se o artista é o artista que criou o álbum procurado
+					
+					if(albumProcurado.getIdArtista() == artistaLogado.getIdArtista()) {
+						System.out.println("Você é o artista criador do álbum!"); 
+						do { 
+							System.out.println("O que desejas editar?"); 
+							System.out.println("1)Nome");
+							System.out.println("2)Capa do Álbum (inserir URL)");
+							System.out.println("3)Ano de lançamento");
+							System.out.println("0)Voltar"); 
+							escolhaDeAtributo = scanner.nextInt(); 
+							scanner.nextLine(); // consome o enter
+							
+							switch(escolhaDeAtributo) { 
+							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							case 1: //MUDANDO NOME 
+								System.out.println("Antigo nome: " + albumProcurado.getNome());
+								System.out.println("Insira o novo nome do álbum:"); 
+								String novoNome = scanner.nextLine(); 
+								albumProcurado.setNome(novoNome); 
+								
+								try {
+									albumDAO.editar(albumProcurado); 
+									
+								} catch(Exception e) {
+									System.out.println("Erro ao mudar nome do álbum: " + e.getMessage());
+						        }
+
+								break; 
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							case 2: //MUDANDO CAPA
+								System.out.println("Insira o novo URL da capa do álbum:"); 
+								
+								String novaCapaURL = scanner.nextLine(); 
+								albumProcurado.setFotoDaCapaURL(novaCapaURL); 
+								
+								try {
+									albumDAO.editar(albumProcurado); 
+									
+								} catch(Exception e) {
+									System.out.println("Erro ao mudar capa do álbum: " + e.getMessage());
+						        }
+
+								break; 
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							case 3: //MUDANDO ANO DE LANÇAMENTO 
+								System.out.println("Antigo ano de lançamento: " + albumProcurado.getAnoLancamento());
+								System.out.println("Insira o novo ano de lançamento:"); 
+								int novoAnoDeLancamento = scanner.nextInt(); 
+								scanner.nextLine(); 
+								albumProcurado.setAnoLancamento(novoAnoDeLancamento); 
+								
+								try {
+									albumDAO.editar(albumProcurado); 
+									
+								} catch(Exception e) {
+									System.out.println("Erro ao mudar ano de lançamento do álbum: " + e.getMessage());
+						        }
+								break;
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+							case 0: //VOLTAR PARA MENU
+								System.out.println("Voltando...");
+								
+								break; 
+								////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							default: 
+								System.out.println("Escolha não existe. Tente de novo."); 
+								
+		
+								break; 
+							}
+						}while (escolhaDeAtributo !=0);
+							
+					
+					}else {
+						System.out.println("Ops... parece que você não é o artista criador desse álbum, tente novamente");
+					}
+				
+					
+				
+				//volta para o menu
+				menuArtista();
+				break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			case 5: //ATUALIZAR MÚSICA
+				System.out.println("Qual o nome da música que deseja editar?"); 
+				String nomeMusicaEditar = scanner.nextLine();
+				List<Musica> musicasPuxadas = musicaDAO.buscarListaMusicaPorNome(nomeMusicaEditar);
+				if(musicasPuxadas.get(0) == null) {
+				    System.out.println("Nenhuma música encontrada com esse nome.");
+				    break; // VE SE EXISTE MESMO ALBUNS COM ESSE NOME
+				}
+				Musica musicaProcurada = musicasPuxadas.get(0);
+				
+				int escolhaDeAtributoMusica = 5; 
+				Album albumDaMusica = albumDAO.buscarPorId(musicaProcurada.getIdAlbum());
+				//verificando se o artista é o artista que criou a música procurada
+				if (albumDaMusica.getIdArtista() == artistaLogado.getIdArtista()) {
+					System.out.println("Você é o artista criador da música!"); 
 					do { 
 						System.out.println("O que desejas editar?"); 
 						System.out.println("1)Nome");
-						System.out.println("2)Capa do Álbum (inserir URL)");
-						System.out.println("3)Ano de lançamento");
-						System.out.println("4)Quero alterar as musicas dentro do álbum");
+						System.out.println("2)Álbum (ver)");
+						System.out.println("3)Tempo de duração:");
 						System.out.println("0)Voltar"); 
 						escolhaDeAtributo = scanner.nextInt(); 
 						scanner.nextLine(); // consome o enter
 						
 						switch(escolhaDeAtributo) { 
-						////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						case 1: //MUDANDO NOME 
-							System.out.println("Insira o novo nome do álbum:"); 
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						case 1: // MUDANDO NOME DA MÚSICA
+							
+							System.out.println("Antigo nome: " + musicaProcurada.getNome());
+							System.out.println("Insira o novo nome da música: "); 
 							String novoNome = scanner.nextLine(); 
-							albumProcurado.setNome(novoNome); 
+							musicaProcurada.setNome(novoNome); 
 							
 							try {
-								albumDAO.editar(albumProcurado); 
+								musicaDAO.editar(musicaProcurada); 
 								
 							} catch(Exception e) {
-								System.out.println("Erro ao mudar nome do álbum: " + e.getMessage());
+								System.out.println("Erro ao mudar nome da música: " + e.getMessage());
 					        }
-
-							break; 
-							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-						case 2: //MUDANDO CAPA
-							System.out.println("Insira o novo URL da capa do álbum:"); 
-							String novaCapaURL = scanner.nextLine(); 
-							albumProcurado.setFotoDaCapaURL(novaCapaURL); 
 							
-							try {
-								albumDAO.editar(albumProcurado); 
-								
-							} catch(Exception e) {
-								System.out.println("Erro ao mudar capa do álbum: " + e.getMessage());
-					        }
-
-							break; 
-							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-						case 3: //MUDANDO ANO DE LANÇAMENTO 
-							System.out.println("Insira o novo ano de lançamento:"); 
-							int novoAnoDeLancamento = scanner.nextInt(); 
-							scanner.nextLine(); 
-							albumProcurado.setAnoLancamento(novoAnoDeLancamento); 
-							
-							try {
-								albumDAO.editar(albumProcurado); 
-								
-							} catch(Exception e) {
-								System.out.println("Erro ao mudar capa do álbum: " + e.getMessage());
-					        }
-
 							break;
-							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-						case 4: //IR PARA MUDAR MUSICA 
-							break; 
-							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						case 2: //MUDANDO ÁLBUM
+							
+							System.out.println("Antigo álbum: " + albumDaMusica.getNome());
+							System.out.println("Insira o nome do novo álbum da música: (testar) "); 
+							String novoNomeAlbum = scanner.nextLine(); 
+							
+							List<Album> albunsPuxadosParaMusica = albumDAO.buscarListaAlbumPorNome(novoNomeAlbum);
+							if (albunsPuxadosParaMusica.get(0) == null) {
+							    System.out.println("Nenhum álbum encontrado com esse nome.");
+							    break; // VE SE EXISTE MESMO ALBUNS COM ESSE NOME
+							}
+							//pega o album
+							Album albumProcuradoParaMusica = albunsPuxadosParaMusica.get(0);
+							
+							//verifica se esse album é do artista logado
+							if(albumProcuradoParaMusica.getIdArtista() == artistaLogado.getIdArtista()) {
+								System.out.println("Você é o artista criador do álbum!"); 
+								//muda o id da musica para o id do album procurado
+								musicaProcurada.setIdAlbum(albumProcuradoParaMusica.getIdAlbum());
+							}else {
+								System.out.println("Ops... parece que você não é o artista criador desse álbum, tente novamente");
+							}
+							
+							
+							
+							try {
+								musicaDAO.editar(musicaProcurada); 
+								
+							} catch(Exception e) {
+								System.out.println("Erro ao mudar o tempo de duração: " + e.getMessage());
+					        }
+							break;
+							
+							
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+						case 3: //MUDANDO TEMPO DE DURAÇÃO
+							System.out.println("Antigo tempo de duracao: " + musicaProcurada.getDuracaoMusica());
+							System.out.println("Insira o novo tempo de duração da música"); 
+							int tempoDuracao = scanner.nextInt(); 
+							scanner.nextLine(); 
+							musicaProcurada.setDuracaoMusica(tempoDuracao);
+							
+							
+							try {
+								musicaDAO.editar(musicaProcurada); 
+								
+							} catch(Exception e) {
+								System.out.println("Erro ao mudar o tempo de duração: " + e.getMessage());
+					        }
+							break;
+					//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 						case 0: //VOLTAR PARA MENU
 							System.out.println("Voltando...");
+							menuArtista(); 
+							
 							break; 
-							////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 						default: 
 							System.out.println("Escolha não existe. Tente de novo."); 
 							
+	
 							break; 
 						}
-					}while (escolhaDeAtributo !=0);
-					
-					
-					
-				}while(escolhaAtualizacao!=0);
-				
-				break; 
-				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			case 5: //ATUALIZAR MÚSICA
+						
+						
+					}while(escolhaDeAtributoMusica !=0);
+				}else {
+					System.out.println("Ops... parece que você não é o artista criador dessa música, tente novamente");
+				}
+
+
+				//volta para o menu
+				menuArtista();
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case 6: //ATUALIZAR PERFIL
+				int escolhaMudarPerfil = 5; 
+				do {
+					System.out.println("O que desejas mudar?");
+					System.out.println("1)Nome:");
+					System.out.println("2)Foto de Perfil:");
+					System.out.println("3)About:");
+					System.out.println("4)Email:");
+					System.out.println("5)Senha:");
+					System.out.println("0)Voltar:");
+					escolhaMudarPerfil = scanner.nextInt();
+					scanner.nextLine(); 
+					
+					switch (escolhaMudarPerfil) {
+                         //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 1: //mudnando nome
+                  
+						System.out.println("Antigo nome: " + artistaLogado.getNome());
+						System.out.println("Insira o novo nome: "); 
+						String novoNome = scanner.nextLine();  
+						
+						artistaLogado.setNome(novoNome);
+						
+						
+						try {
+							artistaDAO.editar(artistaLogado); 
+							
+						} catch(Exception e) {
+							System.out.println("Erro ao mudar o nome: " + e.getMessage());
+				        }
+						break;
+	                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 2: //mudando foto de perfil
+						System.out.println("Antigo foto de perfil: " + artistaLogado.getFotoPerfil());
+						System.out.println("Insira nova URL de perfil: "); 
+						String novaFoto = scanner.nextLine(); 
+						
+						artistaLogado.setFotoPerfil(novaFoto);
+						
+						
+						try {
+							artistaDAO.editar(artistaLogado); 
+							
+						} catch(Exception e) {
+							System.out.println("Erro ao mudar a URL de perfil:  " + e.getMessage());
+				        }
+						
+						break;
+	                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 3: //mudano about
+						System.out.println("Antigo about " + artistaLogado.getAbout());
+						System.out.println("Insira o novo about: " ); 
+						String novoAbout = scanner.nextLine(); 
+						
+						artistaLogado.setAbout(novoAbout);
+						
+						
+						try {
+							artistaDAO.editar(artistaLogado); 
+							
+						} catch(Exception e) {
+							System.out.println("Erro ao mudar o about: " + e.getMessage());
+				        }
+						
+						break;
+	                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 4: //mudando email
+						System.out.println("Antigo email " + artistaLogado.getEmail());
+						
+						String emailNovo ="1"; 
+						String verificando = "2"; 
+						do { 
+							System.out.println("Email: "); 
+							emailNovo = scanner.nextLine(); 
+							System.out.println("Repita a email: "); 
+							verificando = scanner.nextLine(); 
+							
+							if (emailNovo.equals(verificando)) {
+								System.out.println("Email verificado com sucesso!"); 
+							} else { 
+								System.out.println("Os dois emails são diferentes. Tente novamente.");
+							}
+						} while (!emailNovo.equals(verificando)); 
+						
+						
+						artistaLogado.setEmail(emailNovo); 
+						
+						
+						try {
+							artistaDAO.editar(artistaLogado); 
+							
+						} catch(Exception e) {
+							System.out.println("Erro ao mudar o email: " + e.getMessage());
+				        }
+						break; 
+	                    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 5: //mudando senha
+						System.out.println("Antiga senha " + artistaLogado.getSenha());
+					
+						String novaSenha ="1"; 
+						String verificandoSenha = "2"; 
+						do { 
+							System.out.println("Insira no senha: "); 
+							novaSenha = scanner.nextLine(); 
+							System.out.println("Repita a senha: "); 
+							verificandoSenha = scanner.nextLine(); 
+							
+							if (novaSenha.equals(verificandoSenha)) {
+								System.out.println("Senha verificada com sucesso!"); 
+							} else { 
+								System.out.println("As duas senhas são diferentes. Tente novamente.");
+							}
+						} while (!novaSenha.equals(verificandoSenha));
+						
+						
+						artistaLogado.setSenha(novaSenha); 
+						
+						
+						try {
+							artistaDAO.editar(artistaLogado); 
+							
+						} catch(Exception e) {
+							System.out.println("Erro ao mudar o tempo de duração: " + e.getMessage());
+				        }
+						break; 
+	                   
+						//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					case 0: //VOLTAR PARA MENU
+						System.out.println("Voltando...");
+						menuArtista(); 
+						
+						break; 
+				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+					default: 
+						System.out.println("Escolha não existe. Tente de novo."); 
+						
+
+						break; 
+					}
+						
+					}while(escolhaMudarPerfil !=0); 
+				//volta para o menu
+				menuArtista();
 				
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case 7: //DELETAR ÁLBUM
+				//volta para o menu
+				menuArtista();
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			case 8: //DELETAR MÚSICA
+				//volta para o menu
+				menuArtista();
 				break; 
 			case 9: //DELETAR CONTA
+				//volta para o menu
+				menuArtista();
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 			default:
+				//volta para o menu
+				menuArtista();
 				
 				break; 
 				////////////////////////////////////////////////////////////////////////////////////////////////////////////////
