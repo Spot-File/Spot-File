@@ -5,6 +5,7 @@ import model.Musica;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,13 +25,17 @@ public class MusicaDAO {
 		String sql = "INSERT INTO musica (nome,duracao,id_album) VALUES(?,?,?);";
 		try {
 			// preparar o insert para ser executado
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, musica.getNome());
 			st.setInt(2, musica.getDuracaoMusica());
 			// para criar a musica precisa-se criar o album first
 			st.setLong(3, musica.getIdAlbum());
 			// executar essa string de insert
 			st.executeUpdate();
+			ResultSet rs = st.getGeneratedKeys();
+			if(rs.next()) {
+				musica.setIdMusica(rs.getLong(1));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -130,6 +135,32 @@ public class MusicaDAO {
 		}
 		return musicas;
 	}
+	
+	public List<Musica> buscarListaMusicaPorNomeEIdAlbum(String nomeProcurado,long id_album){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM musica WHERE nome LIKE ? AND id_album = ?";
+		List<Musica> musicas = new ArrayList<Musica>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,"%"+ nomeProcurado + "%");
+			st.setLong(2, id_album);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				long idMusica = rs.getLong("id_musica");
+				String nome = rs.getString("nome");
+				int duracao = rs.getInt("duracao");
+				long idAlbum = rs.getLong("id_album");
+				Musica musica = new Musica(idMusica, nome, duracao, idAlbum);
+				musicas.add(musica);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return musicas;
+	}
+	
 	
 	public List<Musica> buscarListaMusica() {
 		conexao.abrirConexao();

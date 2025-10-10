@@ -33,7 +33,11 @@ public class PlaylistDAO {
 			st.setInt(4, playlist.getTempoStreaming());
 			st.setLong(5, playlist.getIdOuvinte());
 			// execução no cmd do sql
-			st.executeUpdate(sql);
+			st.executeUpdate();
+			ResultSet rs = st.getGeneratedKeys();
+			if(rs.next()) {
+				playlist.setIdPlaylist(rs.getLong(1));
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {

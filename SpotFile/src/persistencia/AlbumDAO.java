@@ -36,7 +36,7 @@ public class AlbumDAO {
 			
 			ResultSet rs = st.getGeneratedKeys();
 			if(rs.next()) {
-				album.setIdAlbum(rs.getLong("id_album"));
+				album.setIdAlbum(rs.getLong(1));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -76,11 +76,16 @@ public class AlbumDAO {
 	// EXCLUIR
 	public void excluirAlbumPorId(long id_album) {
 		conexao.abrirConexao();
-		String sql = "DELETE FROM album WHERE id_album = ?;";
+		String sql = "DELETE FROM musica WHERE id_album = ?;";
+		String sql1 = "DELETE FROM album WHERE id_album = ?;";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1,id_album);
 			st.executeUpdate();
+			
+			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+			st1.setLong(1, id_album);
+			st1.executeUpdate();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -129,22 +134,22 @@ public class AlbumDAO {
 	}
 
 	// BUSCAR TODOS (MODELS PRONTOS)
-	public List<Album> buscarListaAlbumPorNome(String nome){
-		conexao.getConexao();
+	public List<Album> buscarListaAlbumPorNome(String nomeProcurado){
+		conexao.abrirConexao();
 		String sql = "SELECT * FROM album WHERE nome LIKE ?;";
 		List<Album> albuns = new ArrayList<Album>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"%" + nome + "%");
+			st.setString(1,"%" + nomeProcurado + "%");
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idAlbum = rs.getLong(1);
 				int anoLancamento = rs.getInt(2);
-				String nome0 = rs.getString(3);
+				String nome = rs.getString(3);
 				String fotoDaCapa = rs.getString(4);
 				int tempoStreaming = rs.getInt(5);
 				long idArtista = rs.getLong(6);
-				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome0, idAlbum,
+				Album album = new Album(buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
 						anoLancamento, idArtista);
 				albuns.add(album);
 			}

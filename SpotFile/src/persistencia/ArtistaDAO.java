@@ -23,20 +23,20 @@ public class ArtistaDAO {
 		conexao.abrirConexao();
 		String sql = "INSERT INTO artista (email,senha,nome,about,foto_de_perfil) VALUES(?,?,?,?,?);";
 		try {
-			
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			st.setString(1, artista.getEmail());
 			st.setString(2, artista.getSenha());
 			st.setString(3, artista.getNome());
 			st.setString(4, artista.getAbout());
 			st.setString(5, artista.getFotoPerfil());
 			st.executeUpdate();
-			
+
 			ResultSet rs = st.getGeneratedKeys();
-			if(rs.next()) {
+			if (rs.next()) {
 				artista.setIdArtista(rs.getLong(1));
 			}
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -76,73 +76,87 @@ public class ArtistaDAO {
 	// EXCLUIR
 	public void excluirArtistaPorId(Artista artista) {
 		conexao.abrirConexao();
-		String sql = "DELETE FROM artista WHERE id_artista = ?;";
+		String sql = "DELETE FROM musica WHERE id_album = ?;";
+		String sql1 = "DELETE FROM album WHERE id_artista = ?;";
+		String sql2 = "DELETE FROM fans WHERE id_artista = ?;";
+		String sql3 = "DELETE FROM artista WHERE id_artista = ?;";
 		try {
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1, artista.getIdArtista());
-			st.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			conexao.fecharConexao();
-		}
-		
-	}
-	
-	//DELETAR POR EMAIL
-	public void excluirArtistaPorEmail(String email) {
-		conexao.abrirConexao();
-		String sql = "SELECT id_artista FROM artista WHERE email = ?;";
-		String sql1 = "SELECT id_album FROM album WHERE id_artista = ?;";
-		String sql2 = "DELETE FROM musica WHERE id_album = ?;";
-		String sql3 = "DELETE FROM album WHERE id_artista = ?;";
-		String sql4 = "DELETE FROM fans WHERE id_artista = ?;";
-		String sql5 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
-		
-		try {
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1, email);
-			ResultSet rs = st.executeQuery();
-			long idArtista = 0;
-			while(rs.next()) {
-				idArtista = rs.getLong(1);
+			
+			for (Album album : buscarListaAlbumPorIdArtista(artista.getIdArtista())) {
+				conexao.abrirConexao();
+				PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+				st.setLong(1, album.getIdAlbum());
+				st.executeUpdate();
+				st.close();
 			}
+
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
-			st1.setLong(1, idArtista);
-			ResultSet rs1 = st1.executeQuery();
-			long[] idAlbum = new long[buscarListaAlbumPorIdArtista(idArtista).size()];
-			
-			for(Album album : buscarListaAlbumPorIdArtista(idArtista)) {
-				PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
-				st2.setLong(1, album.getIdAlbum());
-				st2.executeUpdate();
-				st2.close();
-			}
-			
+			st1.setLong(1, artista.getIdArtista());
+			st1.executeUpdate();
+
+			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
+			st2.setLong(1, artista.getIdArtista());
+			st2.executeUpdate();
+
 			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
-			st3.setLong(1, idArtista);
+			st3.setLong(1, artista.getIdArtista());
 			st3.executeUpdate();
-			
-			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
-			st4.setLong(1, idArtista);
-			st4.executeUpdate();
-			
-			PreparedStatement st5 = conexao.getConexao().prepareStatement(sql5);
-			st5.setLong(1, idArtista);
-			st5.executeUpdate();
-			
-			st.close();
-			st1.close();
-			st3.close();
-			st4.close();
-			st5.close();
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}finally {
 			conexao.fecharConexao();
 		}
+		
 	}
-	
+
+	// DELETAR POR EMAIL
+	public void excluirArtistaPorEmail(String email) {
+		conexao.abrirConexao();
+		String sql = "SELECT id_artista FROM artista WHERE email = ?;";
+		String sql1 = "DELETE FROM musica WHERE id_album = ?;";
+		String sql2 = "DELETE FROM album WHERE id_artista = ?;";
+		String sql3 = "DELETE FROM fans WHERE id_artista = ?;";
+		String sql4 = "DELETE FROM artista WHERE id_artista = ?;";
+
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1, email);
+			ResultSet rs = st.executeQuery();
+			long idArtista = 0;
+			if(rs.next()) {
+				idArtista = rs.getLong(1);
+			}
+			
+			for (Album album : buscarListaAlbumPorIdArtista(idArtista)) {
+				PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+				st1.setLong(1, album.getIdAlbum());
+				st1.executeUpdate();
+				st1.close();
+			}
+
+			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
+			st2.setLong(1, idArtista);
+			st2.executeUpdate();
+
+			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
+			st3.setLong(1, idArtista);
+			st3.executeUpdate();
+
+			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
+			st4.setLong(1, idArtista);
+			st4.executeUpdate();
+
+			st.close();
+			st2.close();
+			st3.close();
+			st4.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+	}
+
 	// BUSCAR
 	public Artista buscarPorIdArtista(long id_artista) {
 		conexao.abrirConexao();
@@ -150,17 +164,17 @@ public class ArtistaDAO {
 		Artista artista = new Artista();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1,id_artista);
+			st.setLong(1, id_artista);
 			ResultSet rs = st.executeQuery();
-			while(rs.next()) {
-				
+			while (rs.next()) {
+
 				long idArtista = rs.getLong("id_artista");
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
 				String nome = rs.getString("nome");
 				String about = rs.getString("about");
 				String fotoPerfil = rs.getString("foto_de_perfil");
-				
+
 				artista.setIdArtista(idArtista);
 				artista.setAbout(about);
 				artista.setEmail(email);
@@ -169,33 +183,32 @@ public class ArtistaDAO {
 				artista.setFotoPerfil(fotoPerfil);
 				artista.setAlbuns(buscarListaAlbumPorIdArtista(idArtista));
 				artista.setFans(buscarFans(idArtista));
-				
-				
+
 			}
-			
-		}catch(SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			conexao.fecharConexao();
 		}
 		return artista;
 	}
-	
+
 	public Artista buscarArtistaPorEmail(String email) {
 		conexao.abrirConexao();
 		String sql = "SELECT*FROM artista WHERE email = ?;";
 		Artista artista = new Artista();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,email);
+			st.setString(1, email);
 			ResultSet rs = st.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				long idArtista = rs.getLong("id_artista");
 				String senha = rs.getString("senha");
 				String nome = rs.getString("nome");
 				String about = rs.getString("about");
 				String fotoPerfil = rs.getString("foto_de_perfil");
-				
+
 				artista.setIdArtista(idArtista);
 				artista.setAbout(about);
 				artista.setEmail(email);
@@ -205,44 +218,44 @@ public class ArtistaDAO {
 				artista.setAlbuns(buscarListaAlbumPorIdArtista(idArtista));
 				artista.setFans(buscarFans(idArtista));
 			}
-			
-		}catch(SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			conexao.fecharConexao();
 		}
 		return artista;
 	}
-	
-	public List<Artista> buscarListaArtistaPorNome(String nome){
+
+	public List<Artista> buscarListaArtistaPorNome(String nome) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM artista WHERE nome LIKE ?;";
 		List<Artista> artistas = new ArrayList<Artista>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"%"+ nome + "%");
+			st.setString(1, "%" + nome + "%");
 			ResultSet rs = st.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				long idArtista = rs.getLong("id_artista");
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
 				String nome0 = rs.getString("nome");
 				String about = rs.getString("about");
 				String fotoPerfil = rs.getString("foto_de_perfil");
-				
-				Artista artista = new Artista(nome0, email, senha, fotoPerfil, idArtista,about,
+
+				Artista artista = new Artista(nome0, email, senha, fotoPerfil, idArtista, about,
 						buscarListaAlbumPorIdArtista(idArtista), buscarFans(idArtista));
 				artistas.add(artista);
 			}
-		}catch(SQLException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			conexao.fecharConexao();
 		}
 		return artistas;
 	}
-	
-	public List<Artista> buscarListaArtistas(){
+
+	public List<Artista> buscarListaArtistas() {
 		conexao.abrirConexao();
 		String sql = "SELECT*FROM artista;";
 		List<Artista> artistas = new ArrayList<Artista>();
@@ -256,8 +269,8 @@ public class ArtistaDAO {
 				String nome = rs.getString("nome");
 				String about = rs.getString("about");
 				String fotoPerfil = rs.getString("foto_de_perfil");
-				
-				Artista artista = new Artista(nome, email, senha, fotoPerfil, idArtista,about,
+
+				Artista artista = new Artista(nome, email, senha, fotoPerfil, idArtista, about,
 						buscarListaAlbumPorIdArtista(idArtista), buscarFans(idArtista));
 				artistas.add(artista);
 			}
@@ -268,8 +281,8 @@ public class ArtistaDAO {
 		}
 		return artistas;
 	}
-	
-	public List<Album> buscarListaAlbumPorIdArtista(long id_artista){
+
+	public List<Album> buscarListaAlbumPorIdArtista(long id_artista) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM album WHERE id_artista = ?;";
 		List<Album> albuns = new ArrayList<Album>();
@@ -285,8 +298,8 @@ public class ArtistaDAO {
 				int tempoStreaming = rs.getInt(5);
 				long idArtista = rs.getLong(6);
 				AlbumDAO aDAO = new AlbumDAO();
-				Album album = new Album(aDAO.buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome, idAlbum,
-						anoLancamento, idArtista);
+				Album album = new Album(aDAO.buscarListaMusicaPorIdAlbum(idAlbum), fotoDaCapa, tempoStreaming, nome,
+						idAlbum, anoLancamento, idArtista);
 				albuns.add(album);
 			}
 		} catch (SQLException e) {
@@ -296,8 +309,8 @@ public class ArtistaDAO {
 		}
 		return albuns;
 	}
-	
-	public List<Ouvinte> buscarFans(long id_artista){
+
+	public List<Ouvinte> buscarFans(long id_artista) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM fans WHERE id_artista = ?;";
 		List<Ouvinte> fans = new ArrayList<Ouvinte>();
@@ -317,11 +330,5 @@ public class ArtistaDAO {
 		}
 		return fans;
 	}
-	
-	
-	
-	
-	
-	
-	
+
 }

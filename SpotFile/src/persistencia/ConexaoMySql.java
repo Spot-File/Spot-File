@@ -28,7 +28,6 @@ public class ConexaoMySql {
 				Class.forName("com.mysql.cj.jdbc.Driver");
 				
 				this.conexao = DriverManager.getConnection(url, LOGIN, SENHA);
-				System.out.println("hey");
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (SQLException e) {

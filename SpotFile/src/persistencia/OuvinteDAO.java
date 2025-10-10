@@ -23,7 +23,7 @@ public class OuvinteDAO {
 		// abrir a conexao
 		conexao.abrirConexao();
 		// montar uma String de insert
-		String sql = "INSERT INTO ouvinte (email,senha,nome,foto_de_perfil_url) VALUES(?,?,?,?);";
+		String sql = "INSERT INTO ouvinte (email,senha,nome,foto_de_perfil) VALUES(?,?,?,?);";
 		String sql1 = "INSERT INTO playlist (nome,id_ouvinte) VALUES('Músicas Favoritas',?);";
 		try {
 			// preparar o insert para ser executado
