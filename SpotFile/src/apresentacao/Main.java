@@ -157,6 +157,8 @@ public class Main {
 						System.out.println("Senha verificada com sucesso!");
 					} else {
 						System.out.println("As duas senhas são diferentes. Tente novamente.");
+						System.out.print("Senha: ");
+						senhaLogin = scanner.nextLine();
 					}
 				} while (!senhaLogin.equals(senhaBD));
 			}
@@ -214,7 +216,7 @@ public class Main {
 			// salva no bd
 			try {
 				albumDAO.salvar(album);
-				System.out.println("Álbum cadastrado com suceeso! Diga olá ao seu novo álbum,  " + album.getNome());
+				System.out.println("Álbum cadastrado com suceso! Diga olá ao seu novo álbum,  " + album.getNome());
 			} catch (Exception e) {
 				System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
 			}
@@ -852,7 +854,7 @@ public class Main {
 
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// ouvinte
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void escolhaOuvinte() {
@@ -879,6 +881,7 @@ public class Main {
 		}
 
 	}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public static void cadastrarOuvinte() {
 		System.out.println("Nome: ");
@@ -931,7 +934,7 @@ public class Main {
 		}
 
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void verificarOuvinte() {
 		
 		//separa os dados para teste
@@ -948,7 +951,7 @@ public class Main {
 			if (ouvinteProcurado == null || ouvinteProcurado.getEmail() == null) {
 				System.out.println("Não existe ouvinte cadastrado com esse email. Verifique email e tente novamente.");
 			} else {
-				System.out.println("Artista encontrado! ");
+				System.out.println("Ouvinte encontrado! Olá,  " + ouvinteProcurado.getNome());
 				senhaBD = ouvinteProcurado.getSenha();
 				do {
 					//testa a senha
@@ -956,6 +959,8 @@ public class Main {
 						System.out.println("Senha verificada com sucesso!");
 					} else {
 						System.out.println("As duas senhas são diferentes. Tente novamente.");
+						System.out.print("Senha: ");
+						senhaLogin = scanner.nextLine();
 					}
 				} while (!senhaLogin.equals(senhaBD));
 			}
@@ -964,11 +969,325 @@ public class Main {
 		//loga o ouvinte
 		ouvinteLogado = ouvinteProcurado;
 	}
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public static void menuOuvinte() {
 		System.out.println("======== SPOT-FILE OUVINTES =========");
 		System.out.println(" O que deseja fazer?");
-		System.out.println(); /// parei aqui
+		// READ & UPDATE & DELETE meio junto
+		System.out.println("1)Buscar artista"); //seguir (update) | mostrar albuns e músicas | salvar albuns e musicas
+		System.out.println("2)Buscar ouvinte"); //seguir (update) | mostrar playlists e musicas salvas | mostrar artistas que segue e ouvintes que seguem e segue
+		System.out.println("3)Buscar música");  //salvar (update) | mostrar album e artista
+		System.out.println("4)Buscar álbum");   // salvar (vai criar nova playlist, ent eh mais um CREATE) | mostrar musicas e artista
+		System.out.println("5)Criar playlist");
+		System.out.println("6)Listar minhas playlists (Biblioteca)"); // mostrar musicas dentro de uma playlist escolhida + PLAYLIST FAVORITAS | atualizar playlist
+		System.out.println("7)Listar seguidores"); // des-SEGUIR (DELETE) | mostrar ouvinte escolhido
+		System.out.println("8)Listar seguindos");  // des-SEGUIR (DELETE) | mostrar ARTISTAS e OUVINTES escolhidos 
+		System.out.println("9)Atualizar perfil");
+		System.out.println("10)Atualizar playlist");
+		System.out.println("11)Deletar playlist"); 
+		System.out.println("12)Deletar perfil");
+		System.out.println("0)Sair"); 
+		int escolhaOuvinte = scanner.nextInt(); 
+		scanner.nextLine(); 
+		
+		switch(escolhaOuvinte) {
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 1 : //BUSCAR ARTISTA
+			System.out.println("Insira o nome do artista procurado:"); 
+			String nomeArtistaProcurado = scanner.nextLine(); 
+			List<Artista> artistasPuxados = artistaDAO.buscarListaArtistaPorNome(nomeArtistaProcurado); 
+			if (artistasPuxados.get(0) == null) {
+				System.out.println("Nennhum artista encontrado com esse nome."); 
+				break;
+			}
+			Artista artistaProcurado = artistasPuxados.get(0); 
+			
+			//printando about 
+			System.out.println(artistaProcurado.getAbout()); 
+		
+			//PRINTANDO ÁLBUNS DE ACORDO COM O TOTAL DE ÁLBUNS CRIADOS DO ARTISTA SELECIONADO
+			int escolhaAlbum; 
+			//maior que 5
+			if(artistaProcurado.getAlbuns().size()>5) {
+				for(int i =0; i<5; i++) {
+					System.out.println(i+1 + ")"); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getNome()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).printarInfos()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getAnoLancamento()); 
+					
+					
+				}
+				System.out.println("Mostrar todos os álbuns? S/N"); // show all
+				String showAll = scanner.nextLine(); 
+				if(showAll.equals("S")) {
+					for (int i = 0; i < artistaProcurado.getAlbuns().size(); i++) {
+						System.out.println(i+1 +")"); 
+						System.out.println(artistaProcurado.getAlbuns().get(i).getNome()); 
+						System.out.println(artistaProcurado.getAlbuns().get(i).printarInfos()); 
+						System.out.println(artistaProcurado.getAlbuns().get(i).getAnoLancamento()); 
+						}
+					//escolhendo um álbum
+					System.out.println("Escolha um álbum! Digite o número indicado: (Para voltar digite 0)"); 
+					escolhaAlbum = scanner.nextInt(); 
+					scanner.nextLine(); 
+					if(escolhaAlbum ==0) {
+						menuOuvinte(); 
+					}
+					//pritando álbum e suas musicas 
+					for(int i = 0; i<artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().size() ; i++) {
+						System.out.println(i+1 +")"); 
+						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getNome()); 
+						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getDuracaoMusica()); 
+					}
+					
+					System.out.println("Digite o número indicado para:"); 
+					System.out.println("1)Salvar álbum"); 
+					System.out.println("2)Salvar música em playlist"); 
+					System.out.println("3)Seguir artista"); 
+					System.out.println("0)Voltar"); 
+					int escolhaDentroDeAlbum = scanner.nextInt(); 
+					scanner.nextLine(); 
+					
+					switch(escolhaDentroDeAlbum) {
+					case 1: //salvando album
+						System.out.println("Salvando álbum, " + artistaProcurado.getAlbuns().get(escolhaAlbum-1).getNome()); 
+						
+						Playlist albumSalvo = new Playlist(); 
+						
+						List<Musica> musicasAlbumSalvo = new ArrayList(); 
+						//pega quantidade de músicas
+						for (int i = 0; i<artistaLogado.getAlbuns().get(escolhaAlbum-1).getMusicas().size(); i++) {
+							
+							Musica musica = new Musica(); 
+							musica.setNome(artistaLogado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getNome()); 
+							musica.setDuracaoMusica(artistaLogado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getDuracaoMusica()); 
+							musica.setIdAlbum(artistaLogado.getAlbuns().get(escolhaAlbum-1).getIdAlbum()); 
+							
+							// salva no bd
+							try {
+								musicaDAO.salvar(musica);
+							} catch (Exception e) {
+								System.out.println("Erro ao salvar musica na playlist de album salvo: " + e.getMessage());
+							}
+							
+							//salvando na lista vazia 
+							musicasAlbumSalvo.add(musica); 
+							
+						
+						}
+						albumSalvo.setNome(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getNome());
+						albumSalvo.setFotoDaCapaURL(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getFotoDaCapaURL()); 
+						albumSalvo.setTempoStreaming(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getTempoStreaming()); 
+						albumSalvo.setIdOuvinte(ouvinteLogado.getIdOuvinte()); 
+						albumSalvo.setMusicas(musicasAlbumSalvo);
+						// salva no bd
+						try {
+							playlistDAO.salvar(albumSalvo);
+							System.out.println("Álbum salvo com sucesso!");
+						} catch (Exception e) {
+							System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
+						}
+						
+						ouvinteLogado.getPlaylists().add(albumSalvo); 
+						
+						
+						
+						break; 
+					case 2: //salvando musica em playlist
+						//escolhendo música
+						int escolhaMusica; 
+						System.out.println("Escolha uma música! Digite o número indicado: (Para voltar digite 0)"); 
+						escolhaMusica = scanner.nextInt(); 
+						scanner.nextLine(); 
+						if(escolhaMusica ==0) {
+							menuOuvinte(); 
+						}
+						//escolhendo playlist 
+						int escolhaPlaylist; 
+						System.out.println("Indique a playlist que quer salvar música:"); 
+						System.out.println("Digite o número indicado para:"); 
+						System.out.println("1)Buscar playlist pelo nome:"); 
+						System.out.println("2)Listar plalist:"); 
+						System.out.println("3)Criar nova playlist: "); 
+						int indicacaoDeBusca = scanner.nextInt(); 
+						scanner.nextLine(); 
+						switch(indicacaoDeBusca) {
+						case 1: 
+							System.out.println("Qual o nome da playlist que você quer salvar?"); 
+							String nomePlaylist = scanner.nextLine(); 
+							List<Playlist> playlistPuxadas = 
+							
+							/*
+							 * String nomeArtistaProcurado = scanner.nextLine(); 
+			List<Artista> artistasPuxados = artistaDAO.buscarListaArtistaPorNome(nomeArtistaProcurado); 
+			if (artistasPuxados.get(0) == null) {
+				System.out.println("Nennhum artista encontrado com esse nome."); 
+				break;
+			}
+			Artista artistaProcurado = artistasPuxados.get(0); 
+							 */
+							
+							break; 
+						case 2: 
+							break; 
+						default:
+							System.out.println("Escolha inválida. Voltando...");
+							menuOuvinte(); 
+						}
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						
+						System.out.println(""); 
+						
+						break; 
+					case 3: //seguir artista
+						System.out.println("Seguindo artista, " + artistaProcurado.getNome()); 
+						artistaProcurado.getFans().add(ouvinteLogado); 
+						
+						// COLOCAR ARTISTA NA LISTA DE SEGUINDOS DO OUVINTE!!!!!!!!!!!!!!!!!!!
+						
+						System.out.println("Artista seguido com sucesso!"); 
+						
+						break; 
+					case 0: // voltar ao menu
+						System.out.println("Voltando ao menu... "); 
+						menuOuvinte(); 
+						break; 
+					default: 
+						System.out.println("Escolha inválida! Voltando ao menu... "); 
+						menuOuvinte(); 
+						break; 
+						
+					}
+					
+						
+					
+					
+					
+				} else {
+					System.out.println("Não mostrar mais."); 
+					//escolhendo um álbum
+					System.out.println("Escolha um álbum! Digite o número indicado: (Para voltar digite 0)"); 
+					escolhaAlbum = scanner.nextInt(); 
+					scanner.nextLine(); 
+					if(escolhaAlbum ==0) {
+						menuOuvinte(); 
+					}
+					//pritando álbum e suas musicas 
+					for(int i = 0; i<artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().size() ; i++) {
+						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getNome()); 
+						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getDuracaoMusica()); 
+					}
+				}
+			
+				
+				//igual a 5
+			} else if (artistaProcurado.getAlbuns().size()==5) {
+				for(int i =0; i<5; i++) {
+					System.out.println(i+1 + ")"); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getNome()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).printarInfos()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getAnoLancamento());
+				}
+				//escolhendo um álbum
+				System.out.println("Escolha um álbum! Digite o número indicado: (Para voltar digite 0)"); 
+				escolhaAlbum = scanner.nextInt(); 
+				scanner.nextLine(); 
+				if(escolhaAlbum ==0) {
+					menuOuvinte(); 
+				}
+				//pritando álbum e suas musicas 
+				for(int i = 0; i<artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().size() ; i++) {
+					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getNome()); 
+					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getDuracaoMusica()); 
+				}
+				
+			} else { //se o numero de álbuns for menor que 5 
+				for (int i = 0; i < artistaProcurado.getAlbuns().size(); i++) {
+					System.out.println(i+1 +")"); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getNome()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).printarInfos()); 
+					System.out.println(artistaProcurado.getAlbuns().get(i).getAnoLancamento()); 
+				}
+				//escolhendo um álbum
+				System.out.println("Escolha um álbum! Digite o número indicado: (Para voltar digite 0)"); 
+				escolhaAlbum = scanner.nextInt(); 
+				scanner.nextLine(); 
+				if(escolhaAlbum ==0) {
+					menuOuvinte(); 
+				}
+				//pritando álbum e suas musicas 
+				for(int i = 0; i<artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().size() ; i++) {
+					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getNome()); 
+					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum-1).getMusicas().get(i).getDuracaoMusica()); 
+				}
+			}
+			
+	
+			
+			
+			
+			
+			
+			
+		
+		
+			
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 2 :  // BUSCAR OUVINTE
+			break;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 3:  // BUSCAR MÚSICA
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 4: //BUSCAR ÁLBUM
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 5: // CRIAR PLAYLIST
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 6: //LISTAR PLAYLISTS (BIBLIOTECA + FAVS)
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 7: //LISTAR SEGUIDORES
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 8: //LISTAR SEGUINDOS
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 9: //ATUALIZAR PERFIL
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 10: //ATUALIZAR PLAYLIST
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 11: //DELETAR PLAYLIST
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 12: //DELETAR PERFIL
+			break; 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		case 0:
+			System.out.println("Saindo...");
+			artistaLogado = null;
+			break;
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		default:
+			System.out.println("Opção Inválida. Tente Novamente.");
+			menuOuvinte();
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		}
+		
+		
 
 	}
 
