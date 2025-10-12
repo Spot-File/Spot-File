@@ -1,5 +1,7 @@
+
 package persistencia;
 
+import model.Album;
 import model.Musica;
 import model.Playlist;
 
@@ -182,6 +184,64 @@ public class PlaylistDAO {
 		return playlists;
 	}
 
+	// BUSCAR TODOS (MODELS PRONTOS)
+	public List<Playlist> buscarListaPlaylistPorNome(String nomeProcurado){
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM playlist WHERE nome LIKE ?;";
+		List<Playlist> playlists = new ArrayList<Playlist>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setString(1,"%" + nomeProcurado + "%");
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idPlaylist = rs.getLong(1);
+				String nome = rs.getString(2);
+				String fotoDaCapa = rs.getString(3);
+				String bio = rs.getString(4);
+				int tempoStreaming = rs.getInt(5);
+				long idOuvinte = rs.getLong(6);
+				Playlist playlist = new Playlist();
+				playlist.setBio(bio);
+				playlist.setFotoDaCapaURL(fotoDaCapa);
+				playlist.setIdOuvinte(idOuvinte);
+				playlist.setIdPlaylist(idPlaylist);
+				playlist.setNome(nome);
+				playlist.setTempoStreaming(tempoStreaming);
+				playlist.setMusicas(buscarListaMusicaPorIdPlaylist(idPlaylist));
+				
+				playlists.add(playlist);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return playlists;
+	}
+	
+	public List<Musica> buscarListaMusicaPorIdPlaylist(long id_playlist) {
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM musica WHERE id_playlist = ?;";
+		List<Musica> musicas = new ArrayList<Musica>();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, id_playlist);
+			ResultSet rs = st.executeQuery();
+			while (rs.next()) {
+				long idMusica = rs.getLong("id_musica");
+				String nome = rs.getString("nome");
+				int duracao = rs.getInt("duracao");
+				long idPlaylist = rs.getLong("id_playlist");
+				Musica musica = new Musica(idMusica, nome, duracao, idPlaylist);
+				musicas.add(musica);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			conexao.fecharConexao();
+		}
+		return musicas;
+	}
 	
 	
 	
