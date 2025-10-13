@@ -1,13 +1,14 @@
 
 package persistencia;
 
-import model.Album;
+
 import model.Musica;
 import model.Playlist;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class PlaylistDAO {
 		String sql = "INSERT INTO playlist (nome,foto_da_capa_url,bio,tempo_de_streaming,id_ouvinte) VALUES(?,?,?,?,?)";
 		try {
 			// preparedStatement pega a conexao e "trabalha" no bd com os dados
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 			// formatação da string por index de:"?"
 			st.setString(1, playlist.getNome());
 			st.setString(2, playlist.getFotoDaCapaURL());
@@ -79,12 +80,17 @@ public class PlaylistDAO {
 	// EXCLUIR
 	public void excluirPorId(Playlist playlist) {
 		conexao.abrirConexao();
-		String sql = "DELETE FROM playlist WHERE id_playlist = ?;DELETE FROM salvo WHERE id_playlist = ?;";
+		String sql = "DELETE FROM salvo WHERE id_playlist = ?;";
+		String sql1 = "DELETE FROM playlist WHERE id_playlist = ?;";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1, playlist.getIdPlaylist());
-			st.setLong(2, playlist.getIdPlaylist());
 			st.executeUpdate();
+		
+			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+			st.setLong(1, playlist.getIdPlaylist());
+			st.executeUpdate();
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -194,21 +200,13 @@ public class PlaylistDAO {
 			st.setString(1,"%" + nomeProcurado + "%");
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
-				long idPlaylist = rs.getLong(1);
-				String nome = rs.getString(2);
-				String fotoDaCapa = rs.getString(3);
-				String bio = rs.getString(4);
-				int tempoStreaming = rs.getInt(5);
-				long idOuvinte = rs.getLong(6);
-				Playlist playlist = new Playlist();
-				playlist.setBio(bio);
-				playlist.setFotoDaCapaURL(fotoDaCapa);
-				playlist.setIdOuvinte(idOuvinte);
-				playlist.setIdPlaylist(idPlaylist);
-				playlist.setNome(nome);
-				playlist.setTempoStreaming(tempoStreaming);
-				playlist.setMusicas(buscarListaMusicaPorIdPlaylist(idPlaylist));
-				
+				long idPlaylist = rs.getLong("id_playlist");
+				String nome = rs.getString("nome");
+				String fotoDaCapa = rs.getString("foto_da_capa_url");
+				String bio = rs.getString("bio");
+				int tempoStreaming = rs.getInt("tempo_de_streaming");
+				long idOuvinte = rs.getLong("id_ouvinte");
+				Playlist playlist = new Playlist(buscarMusicasPorIdPlaylist(idPlaylist),fotoDaCapa,tempoStreaming,nome,idPlaylist,bio,idOuvinte);
 				playlists.add(playlist);
 			}
 		}catch(SQLException e) {
@@ -218,32 +216,7 @@ public class PlaylistDAO {
 		}
 		return playlists;
 	}
-	
-	public List<Musica> buscarListaMusicaPorIdPlaylist(long id_playlist) {
-		conexao.abrirConexao();
-		String sql = "SELECT * FROM musica WHERE id_playlist = ?;";
-		List<Musica> musicas = new ArrayList<Musica>();
-		try {
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1, id_playlist);
-			ResultSet rs = st.executeQuery();
-			while (rs.next()) {
-				long idMusica = rs.getLong("id_musica");
-				String nome = rs.getString("nome");
-				int duracao = rs.getInt("duracao");
-				long idPlaylist = rs.getLong("id_playlist");
-				Musica musica = new Musica(idMusica, nome, duracao, idPlaylist);
-				musicas.add(musica);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			conexao.fecharConexao();
-		}
-		return musicas;
-	}
-	
-	
+		
 	
 	
 	public List<Playlist> buscarListaPlaylistPorIdOuvinte(long id_ouvinte){
@@ -313,4 +286,41 @@ public class PlaylistDAO {
 
 	}
 
+	
+	public void removerMusica(Musica musica,Playlist playlist) {
+		conexao.abrirConexao();
+		String sql = "DELETE FROM salvo WHERE id_musica = ? AND id_playlist = ?;";
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1, musica.getIdMusica());
+			st.setLong(2, playlist.getIdPlaylist());
+			st.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
