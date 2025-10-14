@@ -72,26 +72,33 @@ public class AlbumDAO {
 		}
 
 	}
-
-	// EXCLUIR
+// CHAT AJUDOU! 
 	public void excluirAlbumPorId(long id_album) {
-		conexao.abrirConexao();
-		String sql = "DELETE FROM musica WHERE id_album = ?;";
-		String sql1 = "DELETE FROM album WHERE id_album = ?;";
-		try {
-			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setLong(1,id_album);
-			st.executeUpdate();
-			
-			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
-			st1.setLong(1, id_album);
-			st1.executeUpdate();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			conexao.fecharConexao();
-		}
+	    conexao.abrirConexao();
+	    try {
+	        //  Apagar músicas do álbum na tabela salvo
+	        String sql0 = "DELETE FROM salvo WHERE id_musica IN (SELECT id_musica FROM musica WHERE id_album = ?)";
+	        PreparedStatement st0 = conexao.getConexao().prepareStatement(sql0);
+	        st0.setLong(1, id_album);
+	        st0.executeUpdate();
 
+	        // Apagar as músicas do álbum
+	        String sql1 = "DELETE FROM musica WHERE id_album = ?";
+	        PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
+	        st1.setLong(1, id_album);
+	        st1.executeUpdate();
+
+	        // Apagar o álbum
+	        String sql2 = "DELETE FROM album WHERE id_album = ?";
+	        PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
+	        st2.setLong(1, id_album);
+	        st2.executeUpdate();
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    } finally {
+	        conexao.fecharConexao();
+	    }
 	}
 
 	// BUSCAR (por id)

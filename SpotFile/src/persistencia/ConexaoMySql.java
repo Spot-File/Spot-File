@@ -8,7 +8,7 @@ public class ConexaoMySql {
 	private final String IP = "localhost";
 	private final String PORTA = "3306";
 	private final String LOGIN = "root";
-	private final String SENHA = "1234";
+	private final String SENHA = "pepesani8";
 	private final String NOME_BD = "bd_spot_file";
 	private Connection conexao;
 	

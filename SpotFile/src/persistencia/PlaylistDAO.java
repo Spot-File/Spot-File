@@ -49,6 +49,24 @@ public class PlaylistDAO {
 		}
 
 	}
+	/// VINCULANDO MUSICAS COM PLAYLIST CHAT AJUDOU 
+	public void vincularMusicas(Playlist playlist) {
+    conexao.abrirConexao();
+    String sql = "INSERT INTO salvo (id_playlist, id_musica) VALUES (?, ?)";
+    try {
+        PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+        for (Musica musica : playlist.getMusicas()) {
+            st.setLong(1, playlist.getIdPlaylist());
+            st.setLong(2, musica.getIdMusica());
+            st.addBatch();
+        }
+        st.executeBatch();
+    } catch (SQLException e) {
+        e.printStackTrace();
+    } finally {
+        conexao.fecharConexao();
+    }
+}
 
 	// EDITAR
 	public void editar(Playlist playlist) {
