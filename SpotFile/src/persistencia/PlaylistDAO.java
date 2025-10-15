@@ -1,4 +1,5 @@
 
+
 package persistencia;
 
 
@@ -273,10 +274,8 @@ public class PlaylistDAO {
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idMusica = rs.getLong("id_musica");
-				String nome = rs.getString("nome");
-				int duracao = rs.getInt("duracao");
-				long idAlbum = rs.getLong("id_album");
-				Musica musica = new Musica(idMusica, nome, duracao, idAlbum);
+				MusicaDAO mDAO = new MusicaDAO();
+				Musica musica = mDAO.buscarPorId(idMusica);
 				musicas.add(musica);
 			}
 		} catch (SQLException e) {
