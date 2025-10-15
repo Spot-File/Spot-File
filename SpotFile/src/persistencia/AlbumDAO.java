@@ -60,7 +60,7 @@ public class AlbumDAO {
 			st.setString(1, album.getNome());
 			st.setInt(2, album.getAnoLancamento());
 			st.setString(3, album.getFotoDaCapaURL());
-			st.setInt(4, album.getTempoStreaming());
+			st.setInt(4, calcularTempoStreamingPorIdAlbum(album.getIdAlbum()));
 			st.setLong(5, album.getIdAlbum());
 			// executar essa string de update
 			st.executeUpdate();
@@ -105,7 +105,7 @@ public class AlbumDAO {
 	public Album buscarPorId(long id_album) {
 		// abrir a conexao
 		conexao.abrirConexao();
-		// montar uma String de insert
+		// montar uma String de select
 		String sql = "SELECT * FROM album WHERE id_album = ?";
 		Album album = new Album();
 		try {
@@ -132,7 +132,7 @@ public class AlbumDAO {
 
 			}
 		} catch (SQLException e) {
-			System.out.println("O ID digitado não existe dentro do banco de dados.");
+			e.printStackTrace();
 		} finally {
 			// fechar a conexao
 			conexao.fecharConexao();
@@ -220,6 +220,14 @@ public class AlbumDAO {
 		return musicas;
 	}
 	
+	public int calcularTempoStreamingPorIdAlbum(long id_album) {
+		List<Musica> musicas = buscarListaMusicaPorIdAlbum(id_album);
+		int tempoStreaming = 0;
+		for(Musica musica:musicas) {
+			tempoStreaming += musica.getDuracaoMusica();
+		}
+		return tempoStreaming;
+	}
 
 	
 }

@@ -106,8 +106,8 @@ public class PlaylistDAO {
 			st.executeUpdate();
 		
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
-			st.setLong(1, playlist.getIdPlaylist());
-			st.executeUpdate();
+			st1.setLong(1, playlist.getIdPlaylist());
+			st1.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

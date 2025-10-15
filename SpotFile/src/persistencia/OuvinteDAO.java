@@ -83,11 +83,11 @@ public class OuvinteDAO {
 	// EXCLUIR
 	public void excluirPorId(Ouvinte ouvinte) {
 		conexao.abrirConexao();
-		//TROCAR PARA Quatro DELETES
-		String sql = "DELETE FROM fans WHERE id_ouvinte = ?;";
-		String sql1 = "DELETE FROM seguidores WHERE id_seguido = ?;";
-		String sql2 = "DELETE FROM seguidores WHERE id_seguidor = ?;";
-		String sql3 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
+		String sql = "DELETE FROM playlist WHERE id_ouvinte = ?;";
+		String sql1 = "DELETE FROM fans WHERE id_ouvinte = ?;";
+		String sql2 = "DELETE FROM seguidores WHERE id_seguido = ?;";
+		String sql3 = "DELETE FROM seguidores WHERE id_seguidor = ?;";
+		String sql4 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1, ouvinte.getIdOuvinte());
@@ -104,6 +104,10 @@ public class OuvinteDAO {
 			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
 			st3.setLong(1, ouvinte.getIdOuvinte());
 			st3.executeUpdate();
+			
+			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
+			st4.setLong(1, ouvinte.getIdOuvinte());
+			st4.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -183,6 +187,7 @@ public class OuvinteDAO {
 				ouvinte.setPlaylistFavoritas(pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte));
 				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));
 				ouvinte.setFollowers(buscarSeguidores(idOuvinte));
+				ouvinte.setFollowing(buscarListaUsuarioSeguido(idOuvinte));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -215,6 +220,7 @@ public class OuvinteDAO {
 				ouvinte.setPlaylistFavoritas(pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte));
 				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));conexao.abrirConexao();
 				ouvinte.setFollowers(buscarSeguidores(idOuvinte));
+				ouvinte.setFollowing(buscarListaUsuarioSeguido(idOuvinte));
 			}
 		}catch(SQLException e) {
 			e.printStackTrace();
@@ -224,24 +230,25 @@ public class OuvinteDAO {
 		return ouvinte;
 	}
 	
-	public List<Ouvinte> buscarListaOuvintePorNome(String nome){
+	public List<Ouvinte> buscarListaOuvintePorNome(String nomeProcurado){
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM ouvinte WHERE nome LIKE ?;";
 		List<Ouvinte> ouvintes = new ArrayList<Ouvinte>();
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
-			st.setString(1,"%"+ nome + "%");
+			st.setString(1,"%"+ nomeProcurado + "%");
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idOuvinte = rs.getLong("id_ouvinte");
 				String email = rs.getString("email");
 				String senha = rs.getString("senha");
-				String nome0 = rs.getString("nome");
+				String nome = rs.getString("nome");
 				String fotoPerfil = rs.getString("foto_de_perfil");
 				PlaylistDAO pDAO = new PlaylistDAO();
-				Ouvinte ouvinte = new Ouvinte(nome0, email, senha, fotoPerfil, idOuvinte,
+				Ouvinte ouvinte = new Ouvinte(nome, email, senha, fotoPerfil, idOuvinte,
 						pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte),
-						pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte), buscarSeguidores(idOuvinte));
+						pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte), 
+						buscarSeguidores(idOuvinte),buscarListaUsuarioSeguido(idOuvinte));
 				ouvintes.add(ouvinte);
 			}
 		} catch (SQLException e) {
@@ -268,7 +275,8 @@ public class OuvinteDAO {
 				PlaylistDAO pDAO = new PlaylistDAO();
 				Ouvinte ouvinte = new Ouvinte(nome, email, senha, fotoPerfil, idOuvinte,
 						pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte),
-						pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte), buscarSeguidores(idOuvinte));
+						pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte), 
+						buscarSeguidores(idOuvinte),buscarListaUsuarioSeguido(idOuvinte));
 				ouvintes.add(ouvinte);
 			}
 		} catch (SQLException e) {

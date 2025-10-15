@@ -86,8 +86,9 @@ ALTER TABLE ouvinte CHANGE foto_de_perfil_url foto_de_perfil TEXT;
 ALTER TABLE artista CHANGE foto_de_perfil_url foto_de_perfil TEXT;
 
 SELECT id_musica FROM musica WHERE id_album = ?;
-SELECT * FROM ouvinte WHERE nome LIKE '%ta%';
-SELECT * FROM album;
+SELECT * FROM ouvinte WHERE nome LIKE '%a%';
+SELECT * FROM musica;
+USE bd_spot_file;
 
 
 

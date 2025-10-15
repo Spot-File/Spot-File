@@ -59,7 +59,7 @@ public abstract class Colecao {
 	
 	public String printarInfos () {
 		String printarInfos;
-		int segs = tempoStreaming; 
+		int segs = getTempoStreaming(); 
 		int mins = 0; 
 		int horas = 0; 
 		int nroMusicas = musicas.size(); 
@@ -72,9 +72,9 @@ public abstract class Colecao {
 			mins-=60;
 		}
 		if(horas>0) { 
-			printarInfos = nroMusicas + " músicas, " + horas + " horas, " + mins + " minutos"; 
+			printarInfos = nroMusicas + " músicas, " + horas + " horas e " + mins + " minutos"; 
 		} else if (mins>0) {
-			printarInfos = nroMusicas + " músicas, " + mins + " minutos, " + segs + " segundos"; 
+			printarInfos = nroMusicas + " músicas, " + mins + " minutos e " + segs + " segundos"; 
 		} else if (mins==0 && horas ==0) {
 			printarInfos = nroMusicas + " músicas, " + segs + " segundos";
 		} else {
