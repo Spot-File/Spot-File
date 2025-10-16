@@ -713,53 +713,37 @@ public class Main {
 				System.out.println(" " + (i + 1) + ". " + albumListagem.getNome());
 			} // lista os nomes dos álbuns do artista
 
-			System.out.println("Insira o nome do álbum que deseja deletar ('C' para cancelar):");
-			String nomeDelete = scanner.nextLine();
-			nomeDelete.toUpperCase();
+			System.out.println("Digite o número do álbum que deseja deletar:");
+			int deleteAlbum = scanner.nextInt();
+			scanner.next();
+			Album albumDeletar = deleteAlbuns.get(deleteAlbum - 1);
+			if (albumDeletar == null) {
+				System.out.println("Não foi encontrado o álbum número " + deleteAlbum + ".\nVoltando ao Menu");
+			} else {
+				System.out.println("Tem certeza que deseja deleter o àlbum: " + albumDeletar.getNome() + "? (S/N)");
+				String confirmacao = scanner.next();
+				scanner.nextLine();
+				confirmacao.toUpperCase();
 
-			if (nomeDelete.matches("C")) {
-				System.out.println("Exclusão Cancelada.\n");
-				menuArtista();
-				break;
-			} // Verifica se o usuario quer sair da exclusão de álbum
+				// testa os valores de confirmacao
+				switch (confirmacao) {
+				case "S":
+					try {
+						albumDAO.excluirAlbumPorId(albumDeletar.getIdAlbum());
+						System.out.println("Álbum deletado com sucesso!\n");
 
-			List<Album> albunsArtistaDelete = albumDAO.buscarListaAlbumPorNome(nomeDelete); // procura o album com o
-																							// nome digitado
-			if (!albunsArtistaDelete.isEmpty()) {
-				Album albumDeletar = albunsArtistaDelete.get(0);
-				if (!(albumDeletar.getIdArtista() == artistaLogado.getIdArtista())) { //
-					System.out.println("Não há nenhum álbum com esse nome! Cheque novamente.");
-				} else {
-					System.out.println("Tem certeza que deseja deleter o àlbum: " + albumDeletar.getNome() + "? (S/N)");
-					String confirmacao = scanner.next();
-					scanner.nextLine();
-					confirmacao.toUpperCase();
-
-					// testa os valores de confirmacao
-					switch (confirmacao) {
-					case "S":
-						try {
-							albumDAO.excluirAlbumPorId(albumDeletar.getIdAlbum());
-							System.out.println("Álbum deletado com sucesso!\n");
-
-						} catch (Exception e) {
-							System.out.println("Erro ao deletar álbum: " + e.getMessage());
-						}
-						;
-						artistaLogado.setAlbuns(artistaDAO.buscarListaAlbumPorIdArtista(artistaLogado.getIdArtista()));
-
-							// ATUALIZA MEMÓRIA
-						artistaLogado = artistaDAO.buscarPorIdArtista(artistaLogado.getIdArtista());
-
-						break;
-					case "N":
-						System.out.println("Exclusão Cancelada.\n");
-						;
-						break;
-					default:
-						System.out.println("Opção Inválida!");
-
+					} catch (Exception e) {
+						System.out.println("Erro ao deletar álbum: " + e.getMessage());
 					}
+					artistaLogado = atualizarArtista(artistaLogado);
+					break;
+				case "N":
+					System.out.println("Exclusão Cancelada.\n");
+					;
+					break;
+				default:
+					System.out.println("Opção Inválida!");
+
 				}
 			}
 			menuArtista();
@@ -859,6 +843,7 @@ public class Main {
 			System.out.println("\n");
 			menuArtista();
 			break;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 9: // DELETAR CONTA
 			System.out.println("=== EXCLUSÃO DE CONTA ===");
 			System.out.println(
@@ -871,13 +856,13 @@ public class Main {
 					confirmacao.toUpperCase();
 					switch (confirmacao) {
 					case "S":
-						System.out.println(
-								"Estamos apagando suas músicas... Foi bom enquanto durou, " + artistaLogado.getNome());
+						System.out.println("Estamos apagando suas músicas... Foi bom enquanto durou.");
 
 						try {
 							artistaDAO.excluirArtistaPorId(artistaLogado);
+							System.out.println("Adeus " + artistaLogado.getNome());
 							System.out.println("Voltando ao menu...");
-
+							artistaLogado = null;
 						} catch (Exception e) {
 							System.out.println("Erro ao deletar conta: " + e.getMessage());
 						}
@@ -1057,7 +1042,7 @@ public class Main {
 			System.out.println("Insira o nome do artista procurado:");
 			String nomeArtistaProcurado = scanner.nextLine();
 			List<Artista> artistasPuxados = artistaDAO.buscarListaArtistaPorNome(nomeArtistaProcurado);
-			if (artistasPuxados.isEmpty()){
+			if (artistasPuxados.get(0) == null) {
 				System.out.println("Nennhum artista encontrado com esse nome.");
 				break;
 			}
@@ -1099,21 +1084,18 @@ public class Main {
 					if (escolhaAlbum == 0) {
 						menuOuvinte();
 					}
-					System.out.println("Quantidade de músicas: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size());
-					System.out.println("Escolheu o álbum: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getNome());
-
-					//Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
+					Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
 					// pritando álbum e suas musicas
-					for (int i = 0; i < artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size(); i++) {
+					for (int i = 0; i < albumProcurado.getMusicas().size(); i++) {
 						System.out.println("Músicas do álbum:");
 						System.out.print(i + 1 + ")");
 
 						System.out.print("•");
-						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getNome());
+						System.out.println(albumProcurado.getMusicas().get(i).getNome());
 						System.out.print("    -");
-						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getDuracaoMusica());
+						System.out.println(albumProcurado.getMusicas().get(i).getDuracaoMusica());
 					}
-					//acoesAlbum(artistaProcurado, escolhaAlbum);
+					acoesAlbum(artistaProcurado, escolhaAlbum);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////					
 
 				} else {
@@ -1125,21 +1107,18 @@ public class Main {
 					if (escolhaAlbum == 0) {
 						menuOuvinte();
 					}
-					System.out.println("Quantidade de músicas: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size());
-					System.out.println("Escolheu o álbum: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getNome());
-
-					//Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
+					Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
 					// pritando álbum e suas musicas
-					for (int i = 0; i < artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size(); i++) {
+					for (int i = 0; i < albumProcurado.getMusicas().size(); i++) {
 						System.out.println("Músicas do álbum:");
 						System.out.print(i + 1 + ")");
 
 						System.out.print("•");
-						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getNome());
+						System.out.println(albumProcurado.getMusicas().get(i).getNome());
 						System.out.print("    -");
-						System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getDuracaoMusica());
+						System.out.println(albumProcurado.getMusicas().get(i).getDuracaoMusica());
 					}
-					//acoesAlbum(artistaProcurado, escolhaAlbum);
+					acoesAlbum(artistaProcurado, escolhaAlbum);
 				}
 
 				// igual a 5
@@ -1157,21 +1136,18 @@ public class Main {
 				if (escolhaAlbum == 0) {
 					menuOuvinte();
 				}
-				System.out.println("Quantidade de músicas: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size());
-				System.out.println("Escolheu o álbum: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getNome());
-
-				//Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
+				Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
 				// pritando álbum e suas musicas
 				for (int i = 0; i < artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size(); i++) {
 					System.out.println("Músicas do álbum:");
 					System.out.print(i + 1 + ")");
 
 					System.out.print("•");
-					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getNome());
+					System.out.println(albumProcurado.getMusicas().get(i).getNome());
 					System.out.print("    -");
-					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getDuracaoMusica());
+					System.out.println(albumProcurado.getMusicas().get(i).getDuracaoMusica());
 				}
-				//acoesAlbum(artistaProcurado, escolhaAlbum);
+				acoesAlbum(artistaProcurado, escolhaAlbum);
 
 			} else { // se o numero de álbuns for menor que 5
 				for (int i = 0; i < artistaProcurado.getAlbuns().size(); i++) {
@@ -1187,30 +1163,26 @@ public class Main {
 				if (escolhaAlbum == 0) {
 					menuOuvinte();
 				}
-				System.out.println("Quantidade de músicas: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size());
-				System.out.println("Escolheu o álbum: " + artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getNome());
-
-				//Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
+				Album albumProcurado = artistaProcurado.getAlbuns().get(escolhaAlbum - 1);
 				// pritando álbum e suas musicas
-				for (int i = 0; i < artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().size(); i++) {
+				for (int i = 0; i < albumProcurado.getMusicas().size(); i++) {
 					System.out.println("Músicas do álbum:");
 					System.out.print(i + 1 + ")");
 
 					System.out.print("•");
-					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getNome());
+					System.out.println(albumProcurado.getMusicas().get(i).getNome());
 					System.out.print("    -");
-					System.out.println(artistaProcurado.getAlbuns().get(escolhaAlbum - 1).getMusicas().get(i).getDuracaoMusica());
+					System.out.println(albumProcurado.getMusicas().get(i).getDuracaoMusica());
 
-					//acoesAlbum(artistaProcurado, escolhaAlbum);
+					acoesAlbum(artistaProcurado, escolhaAlbum);
 
 				}
 			}
-			acoesAlbum(artistaProcurado, escolhaAlbum);
+
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 2: // BUSCAR OUVINTE
-			
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1219,32 +1191,6 @@ public class Main {
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 4: // BUSCAR ÁLBUM
-			System.out.println("Insira o nome do álbum que procuras:"); 
-			String nomeAlbumProcurado = scanner.nextLine(); 
-			List<Album> albunsPuxados = albumDAO.buscarListaAlbumPorNome(nomeAlbumProcurado); 
-			if(albunsPuxados.isEmpty()) {
-				System.out.println("Não existe álbum com esse nome! Verifique se o nome está correto e tente novamente."); 
-				break;
-			}
-			Album albumProcurado = albunsPuxados.get(0); 
-			Artista artistaCriador = artistaDAO.buscarPorIdArtista(albumProcurado.getIdArtista()); 
-			System.out.println("Artista criador: " + artistaCriador.getNome()); 
-			
-			
-			System.out.println("Músicas do álbum:");
-			// pritando álbum e suas musicas
-			for (int i = 0; i < albumProcurado.getMusicas().size(); i++) {
-				
-				System.out.print(i + 1 + ")");
-
-				System.out.print("•");
-				System.out.println(albumProcurado.getMusicas().get(i).getNome());
-				System.out.print("    -");
-				System.out.println(albumProcurado.getMusicas().get(i).getDuracaoMusica());
-			}
-			acoesAlbum2(artistaCriador, albumProcurado);
-			
-			
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1260,113 +1206,30 @@ public class Main {
 			System.out.println("Foto da capa:");
 			String fotoCapaURlPlaylist = scanner.nextLine();
 
-			Playlist playlist = new Playlist();
-			playlist.setBio(bioPlaylist);
-			playlist.setFotoDaCapaURL(fotoCapaURlPlaylist);
-			playlist.setNome(nomePlaylist);
-			playlist.setMusicas(musicasPlaylist);
-			playlist.setIdOuvinte(ouvinteLogado.getIdOuvinte());
+			Playlist playlistCriada = new Playlist();
+			playlistCriada.setBio(bioPlaylist);
+			playlistCriada.setFotoDaCapaURL(fotoCapaURlPlaylist);
+			playlistCriada.setNome(nomePlaylist);
+			playlistCriada.setMusicas(musicasPlaylist);
+			playlistCriada.setIdOuvinte(ouvinteLogado.getIdOuvinte());
 
 			// salva no bd
 			try {
-				playlistDAO.salvar(playlist);
+				playlistDAO.salvar(playlistCriada);
 				System.out.println(
-						"Playlist cadastrada com suceso! Diga olá a sua nova playlist,  " + playlist.getNome());
+						"Playlist cadastrada com suceso! Diga olá a sua nova playlist,  " + playlistCriada.getNome());
 			} catch (Exception e) {
 				System.out.println("Erro ao cadastrar playlist: " + e.getMessage());
 			}
-			// ATUALIZA MEMÓRIA
-			ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
+			// atualiza a memória
+			ouvinteLogado = atualizarOuvinte(ouvinteLogado);
 
 			System.out.println("Adicionar músicas a playlist? (S/N)");
 			String escolhaAdicionarMusicas = scanner.nextLine();
 			if (escolhaAdicionarMusicas.equals("S")) {
-				Playlist favoritas = ouvinteLogado.getPlaylistFavoritas(); 
-				int totalMusicas = favoritas.getMusicas().size();
-				int nroMusicaEscolhida = 0;
-				
-				///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				if(favoritas.getMusicas().size()==0) {
-					System.out.println("Você não tem músicas favoritas... Para adicionar músicas em playlists criadas dê uma pesquisada em artistas, álbuns, ouvintes... Adicione sempre as músicas que gostar na favoritas e então adcione a na sua playlist!");
-				} if (totalMusicas >5){
-					//mostra as últimas cinco adicionadas
-					System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
-					for (int i= 0; i<5; i++) {
-						System.out.println(i+1 +")");
-						System.out.println(favoritas.getMusicas().get(totalMusicas-i).getNome());
-						System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(totalMusicas-i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
-						
-					}
-					System.out.println("=============================="); 
-					
-					System.out.println("Mostrar todas? (S/N)"); 
-					String showAllFavoritas = scanner.nextLine(); 
-					//mostra todas
-					if(showAllFavoritas.equals("S")) {
-						System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
-						for (int i = 0; i<favoritas.getMusicas().size();i++) {
-							System.out.println(i+1 +")");
-							System.out.println(favoritas.getMusicas().get(i).getNome());
-							System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
-						}
-					} 
-					System.out.println("==============================");
-					
-					
-					
-				} else if (totalMusicas == 5) {
-					System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
-					for (int i =0; i<5; i++) {
-						System.out.println(i+1 +")");
-						System.out.println(favoritas.getMusicas().get(i).getNome());
-						System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
-							
-					}
-					System.out.println("==============================");
-				
-				} else if(totalMusicas<5) {
-					System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
-					for (int i = 0; i<favoritas.getMusicas().size();i++) {
-						System.out.println(i+1 +")");
-						System.out.println(favoritas.getMusicas().get(i).getNome());
-						System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
-					}
-					System.out.println("==============================");
-			
-				}
 
-				///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-				
-
-				int continuar =5;
-				do { 
-					System.out.println("Escolha uma música pelo número indicado: (para sair digite 0)");
-					nroMusicaEscolhida  = scanner.nextInt(); 
-					if(nroMusicaEscolhida==0) {
-						menuOuvinte(); 
-					}
-					
-					scanner.nextLine(); 
-					Musica musicaEscolhida = favoritas.getMusicas().get(nroMusicaEscolhida -1); 
-					playlist.getMusicas().add(musicaEscolhida); 
-					
-					try {
-						playlistDAO.adicionarMusica(musicaEscolhida, playlist);
-					} catch (Exception e) {
-						System.out.println("Erro ao salvar música: " + e.getMessage());
-					}
-					
-					// ATUALIZA MEMÓRIA
-					ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
-					System.out.println("Continuar adicionando? (Digite qualquer coisa diferente de 0, para sair digite 0");
-					continuar = scanner.nextInt(); 
-					scanner.nextLine(); 
-					
-				}while(continuar!=0);
-			
-			
 			} else if (escolhaAdicionarMusicas.equals("N")) {
-				System.out.println("Ok...Voltando!");
+
 			} else {
 				System.out.println("Escolha inválida. Voltando...");
 			}
@@ -1374,7 +1237,7 @@ public class Main {
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		case 6: // LISTAR PLAYLISTS (BIBLIOTECA + FAVS)
+		case 6: // LISTAR PLAYLISTS (BIBLIOTECA + FAVS) ---- RETIFICAR
 			int opcaoVoltarBiblioteca = 1;
 			do {
 				System.out.println("=== SUA BIBLIOTECA ===");
@@ -1496,12 +1359,7 @@ public class Main {
 						if (seguidorProcurado == null) {
 							System.out.println("Seguidor não encontrado!\nTente novamente");
 						} else {
-							System.out.println("=== Perfil de " + seguidorProcurado.getNome() + " ===");
-							System.out.println(seguidorProcurado.getPlaylists().size() + " Playlists");
-							System.out.println(seguidorProcurado.getFollowers().size() + " Seguidores");
-							System.out.println(seguidorProcurado.getFollowing().size() + " Seguindo");
-							System.out.println("---------------------------------");
-							acoesSeguidores(ouvinteLogado, seguidorProcurado);
+							acoesSeguidores(seguidorProcurado);
 						}
 						break;
 					case 0:
@@ -1543,12 +1401,7 @@ public class Main {
 						if (seguidorProcurado == null) {
 							System.out.println("Seguidor não encontrado!\nTente novamente");
 						} else {
-							System.out.println("=== Perfil de " + seguidorProcurado.getNome() + " ===");
-							System.out.println(seguidorProcurado.getPlaylists().size() + " Playlists");
-							System.out.println(seguidorProcurado.getFollowers().size() + " Seguidores");
-							System.out.println(seguidorProcurado.getFollowing().size() + " Seguindo");
-							System.out.println("---------------------------------");
-							acoesSeguidores(ouvinteLogado, seguidorProcurado);
+							acoesSeguidores(seguidorProcurado);
 						}
 						break;
 					case 0:
@@ -1566,22 +1419,200 @@ public class Main {
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 8: // LISTAR SEGUINDOS
+			int opcaoVoltarSeguindo = 1;
+			do {
+				System.out.println("=== SEUS SEGUIDOS ===");
+				List<Usuario> seguidos = ouvinteLogado.getFollowing();
+				if (seguidos.size() > 5) {
+					for (int i = 0; i < 5; i++) {
+						System.out.println((i + 1) + ". " + seguidos.get(i).getNome());
+					}
+					System.out.println("---------------------");
+					System.out.println("1) Vizualizar Perfil de Seguido");
+					System.out.println("2) Ver todos");
+					System.out.println("0) Voltar");
+					int opcaoVizualizarSeguido = scanner.nextInt();
+					scanner.nextLine();
+					switch (opcaoVizualizarSeguido) {
+					case 1:
+						acoesSeguido(seguidos);
+						break;
+					case 2:
+						System.out.println("=== LISTA COMPLETA DE SEGUIDOS ===");
+						for (int i = 0; i < seguidos.size(); i++) {
+							System.out.println((i + 1) + ". " + seguidos.get(i).getNome());
+						}
+						System.out.println("---------------------");
+						System.out.println("1) Vizualizar Perfil de Seguido");
+						System.out.println("0) Voltar");
+						int opcaoVizualizarSeguidoCompleto = scanner.nextInt();
+						scanner.nextLine();
+						switch (opcaoVizualizarSeguidoCompleto) {
+						case 1:
+							acoesSeguido(seguidos);
+							break;
+						case 0:
+							System.out.println("Voltando...");
+							break;
+						default:
+							System.out.println("Opcao Inválida!");
+							System.out.println("Voltando...");
+						}
+						break;
+					case 0:
+						opcaoVoltarSeguindo = 0;
+						System.out.println("Voltando ao Menu...");
+						break;
+					default:
+						System.out.println("Opção Inválida! Tente Novamente...");
+					}
+
+				} else if (!seguidos.isEmpty()) {
+					for (int i = 0; i < seguidos.size(); i++) {
+						System.out.println((i + 1) + ". " + seguidos.get(i).getNome());
+					}
+					System.out.println("---------------------");
+					System.out.println("1) Vizualizar Perfil de Seguido");
+					System.out.println("0) Voltar");
+					int opcaoVizualizarSeguido = scanner.nextInt();
+					scanner.nextLine();
+					switch (opcaoVizualizarSeguido) {
+					case 1:
+						acoesSeguido(seguidos);
+						break;
+					case 0:
+						opcaoVoltarSeguindo = 0;
+						System.out.println("Voltando ao Menu...");
+						break;
+					default:
+						System.out.println("Opção Inválida! Tente Novamente...");
+					}
+				}
+			} while (opcaoVoltarSeguindo != 0);
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 9: // ATUALIZAR PERFIL
+			int opcaoVoltarPerfil = 1;
+			do {
+				System.out.println("=== ATUALIZANDO PERFIL ===");
+				System.out.println("O que deseja atualizar?");
+				System.out.println("1) Nome");
+				System.out.println("2) Email");
+				System.out.println("3) Senha");
+				System.out.println("4) Foto de Perfil");
+				System.out.println("0) Voltar");
+				int opcaoAtualizarPerfil = scanner.nextInt();
+				scanner.nextLine();
+				switch (opcaoAtualizarPerfil) {
+				case 1:
+					System.out.println("Nome Antigo: " + ouvinteLogado.getNome());
+					System.out.println("Novo nome: ");
+					String novoNome = scanner.nextLine();
+					ouvinteLogado.setNome(novoNome);
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+					break;
+				case 2:
+					System.out.println("Email Antigo: " + ouvinteLogado.getEmail());
+					System.out.println("Novo Email: ");
+					String novoEmail = scanner.nextLine();
+					ouvinteLogado.setEmail(novoEmail);
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+					break;
+				case 3:
+					System.out.println("Senha Antiga: " + ouvinteLogado.getSenha());
+					System.out.println("Nova Senha: ");
+					String novaSenha = scanner.nextLine();
+					ouvinteLogado.setSenha(novaSenha);
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+					break;
+				case 4:
+					System.out.println("Foto Antiga: " + ouvinteLogado.getFotoPerfil());
+					System.out.println("Nova Foto: ");
+					String novaFoto = scanner.nextLine();
+					ouvinteLogado.setFotoPerfil(novaFoto);
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+					break;
+				case 0:
+					System.out.println("Voltando ao Menu...");
+					opcaoVoltarPerfil = 0;
+					break;
+				default:
+					System.out.println("Opção Inválida! Tente Novamente...");
+				}
+			} while (opcaoVoltarPerfil != 0);
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 10: // ATUALIZAR PLAYLIST & add musica
+			// FAZER LOGO :_)
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 11: // DELETAR PLAYLIST
+			System.out.println("=== DELETAR PLAYLIST ===");
+			List<Playlist> playlists = ouvinteLogado.getPlaylists();
+			for (int i = 0; i < playlists.size(); i++) {
+				System.out.println((i + 1) + ". " + playlists.get(i).getNome());
+			}
+			System.out.println("Ao apagar a sua playlist, irá perder a sua coletânea única");
+			System.out.println("e personalizada. Será apagada para sempre!(é realmente muito tempo)");
+			System.out.println("Digite o número da playlist que deseja deletar: ");
+			int deletarPlaylist = scanner.nextInt();
+			scanner.nextLine();
+			Playlist playlistDeletar = playlists.get(deletarPlaylist - 1);
+			if (playlistDeletar == null || playlistDeletar.getNome() == null) {
+				System.out.println("Não foi encontrada a playlist de número " + deletarPlaylist);
+			} else {
+				System.out.println("Queres deletar a playlist: " + playlistDeletar.getNome() + "? (S/N)");
+				String confirmacaoDeletarPlaylist = scanner.nextLine();
+				confirmacaoDeletarPlaylist.toUpperCase();
+				if (confirmacaoDeletarPlaylist.matches("S")) {
+					System.out.println("Deletando...");
+					try {
+						playlistDAO.excluirPorId(playlistDeletar);
+					} catch (Exception e) {
+						System.out.println("Não foi possível excluir pois: " + e.getMessage());
+					} finally {
+						ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+					}
+				} else {
+					System.out.println("Exclusão Cancelada!");
+					System.out.println("Voltando ao Menu...");
+				}
+			}
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 12: // DELETAR PERFIL
+			System.out.println("=== DELETAR PERFIL ===");
+			System.out.println("Apagando o seu perfil, irá deixar de fazer parte");
+			System.out.println("da nossa amada comunidade SpotFile.");
+			System.out.println("Você tem certeza que deseja deletar sua conta?(S/N)");
+			String confirmacaoDeletarConta = scanner.nextLine();
+			confirmacaoDeletarConta.toUpperCase();
+			if (confirmacaoDeletarConta.matches("S")) {
+				System.out.println("Certeza Absoluta??(S/N)");
+				confirmacaoDeletarConta = scanner.nextLine();
+				confirmacaoDeletarConta.toUpperCase();
+				if (confirmacaoDeletarConta.matches("S")) {
+					System.out.println("Nunca é um Adeus. Mas sim um até logo.");
+					System.out.println("Até Logo, " + ouvinteLogado.getNome());
+					System.out.println("Deletando a conta...");
+					try {
+						ouvinteDAO.excluirPorId(ouvinteLogado);
+						System.out.println("Conta excluída...");
+						System.out.println("Voltando ao Login");
+						ouvinteLogado = null;
+					} catch (Exception e) {
+						System.out.println("Não foi possível excluir a conta pois: " + e.getMessage());
+					}
+				} else {
+
+				}
+			} else {
+
+			}
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1629,6 +1660,20 @@ public class Main {
 		playlistDAO.editar(playlist);
 		playlist = playlistDAO.buscarPlaylistPorId(playlist.getIdPlaylist());
 		return playlist;
+	}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// CHECAR SE OUVINTE OU ARTISTA
+	public static boolean ouvinteOuArtista(Usuario usuario) {
+		List<Artista> artistas = artistaDAO.buscarListaArtistas();
+		boolean oOuA = false;
+		for (Artista artista : artistas) {
+			if (artista.getEmail().equals(usuario.getEmail())) {
+				oOuA = true;
+				break;
+			}
+		}
+		return oOuA; // true para artista,false para ouvinte;
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1835,209 +1880,6 @@ public class Main {
 		}
 
 	}
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public static void acoesAlbum2(Artista artistaCriador, Album albumProcurado) {
-		System.out.println("Digite o número indicado para:");
-		System.out.println("1)Salvar álbum");
-		System.out.println("2)Salvar música em playlist");
-		System.out.println("3)Seguir artista");
-		System.out.println("0)Voltar");
-		int escolhaDentroDeAlbum = scanner.nextInt();
-		scanner.nextLine();
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		switch (escolhaDentroDeAlbum) {
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		case 1: // salvando album
-			System.out.println("Salvando álbum, " + albumProcurado.getNome());
-
-			Playlist albumSalvo = new Playlist();
-
-			// pega diretamente as músicas do álbum original (sem recriar)
-			List<Musica> musicasAlbumSalvo = new ArrayList<Musica>(
-					albumProcurado.getMusicas());
-
-			albumSalvo.setNome(albumProcurado.getNome());
-			albumSalvo.setFotoDaCapaURL(albumProcurado.getFotoDaCapaURL());
-			albumSalvo.setTempoStreaming(albumProcurado.getTempoStreaming());
-			albumSalvo.setIdOuvinte(ouvinteLogado.getIdOuvinte());
-			albumSalvo.setMusicas(musicasAlbumSalvo);
-			// salva no bd
-			try {
-				playlistDAO.salvar(albumSalvo); // salva a playlist em si
-				playlistDAO.vincularMusicas(albumSalvo); // cria os vínculos com as músicas existentes
-
-				System.out.println("Álbum salvo com sucesso!");
-			} catch (Exception e) {
-				System.out.println("Erro ao cadastrar álbum: " + e.getMessage());
-			}
-			// ATUALIZA MEMÓRIA
-			ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
-
-			menuOuvinte();
-			break;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		case 2: // salvando musica em playlist
-			Playlist playlistProcurada = null;
-			// escolhendo música
-
-			int escolhaMusica;
-			System.out.println("Escolha uma música! Digite o número indicado: (Para voltar digite 0)");
-			escolhaMusica = scanner.nextInt();
-			Musica musicaEscolhida =albumProcurado.getMusicas()
-					.get(escolhaMusica - 1);
-			scanner.nextLine();
-			if (escolhaMusica == 0) {
-				System.out.println("Voltando...");
-				menuOuvinte();
-			}
-			// escolhendo playlist
-
-			int escolhaPlaylist;
-			System.out.println("Indique a playlist que quer salvar música:");
-			System.out.println("Digite o número indicado para:");
-			System.out.println("1)Buscar playlist pelo nome:");
-			System.out.println("2)Listar nomes playlist:");
-			System.out.println("3)Criar nova playlist: ");
-			int indicacaoDeBusca = scanner.nextInt();
-			scanner.nextLine();
-			switch (indicacaoDeBusca) {
-
-			case 1: // buscar playlist
-				System.out.println("Qual o nome da playlist que você quer salvar?");
-				String nomePlaylist = scanner.nextLine();
-				List<Playlist> playlistPuxadas = playlistDAO.buscarListaPlaylistPorNome(nomePlaylist);
-				if (playlistPuxadas.isEmpty()) {
-					System.out.println("Nenhuma playlist encontrada com esse nome.");
-					break;
-				}
-				playlistProcurada = playlistPuxadas.get(0);
-
-				break;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			case 2: // listar playlists
-
-				if (!ouvinteLogado.getPlaylists().isEmpty() && ouvinteLogado.getPlaylists().size() > 5) {
-					for (int i = 0; i < ouvinteLogado.getPlaylists().size(); i++) {
-						System.out.println(i + 1 + ")");
-						System.out.println(ouvinteLogado.getPlaylists().get(i).getNome());
-					}
-					System.out.println("Mostrar todas as playlists? S/N"); // show all
-					String showAllPlaylist = scanner.nextLine();
-					if (showAllPlaylist.equals("S")) {
-						for (int i = 0; i < ouvinteLogado.getPlaylists().size(); i++) {
-							System.out.println(i + 1 + ")");
-							System.out.println(ouvinteLogado.getPlaylists().get(i).getNome());
-						}
-					}
-				} else if (ouvinteLogado.getPlaylists().size() == 5) {
-					for (int i = 0; i < ouvinteLogado.getPlaylists().size(); i++) {
-						System.out.println(i + 1 + ")");
-						System.out.println(ouvinteLogado.getPlaylists().get(i).getNome());
-					}
-				} else {
-					for (int i = 0; i < ouvinteLogado.getPlaylists().size(); i++) {
-						System.out.println(i + 1 + ")");
-						System.out.println(ouvinteLogado.getPlaylists().get(i).getNome());
-					}
-
-				}
-				// escolhendo a playlist
-				System.out
-						.println("Escolha a playlist! Digite o número indicado: (Para playlist de favoritas digite 0)");
-				escolhaPlaylist = scanner.nextInt();
-				scanner.nextLine();
-				if (escolhaPlaylist == 0) {
-					playlistProcurada = ouvinteLogado.getPlaylistFavoritas();
-				} else {
-					playlistProcurada = ouvinteLogado.getPlaylists().get(escolhaPlaylist - 1);
-				}
-
-				break;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-			case 3: // criar nova playlist
-				Playlist playlist = new Playlist();
-				playlist.setNome(musicaEscolhida.getNome());
-				List<Musica> musicaPlaylist = new ArrayList<Musica>();
-				musicaPlaylist.add(musicaEscolhida);
-				playlist.setMusicas(musicaPlaylist);
-				playlist.setIdOuvinte(ouvinteLogado.getIdOuvinte());
-				playlist.setTempoStreaming(musicaEscolhida.getDuracaoMusica());
-				playlist.setFotoDaCapaURL(albumDAO.buscarPorId(musicaEscolhida.getIdAlbum()).getFotoDaCapaURL());
-
-				// salva no bd
-				try {
-					playlistDAO.salvar(playlist); // salva a playlist em si
-					playlistDAO.vincularMusicas(playlist); // cria os vínculos com as músicas existentes
-
-					System.out.println("Playlist criada com sucesso!");
-				} catch (Exception e) {
-					System.out.println("Erro ao criar playlist: " + e.getMessage());
-				}
-				// ATUALIZA MEMÓRIA
-				ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
-
-				break;
-			default:
-				System.out.println("Escolha inválida. Voltando...");
-				menuOuvinte();
-			}
-
-			// salvando musica na playlist escolhida
-
-			if (indicacaoDeBusca != 3) {
-				System.out.println("Salvando música, " + musicaEscolhida.getNome() + ", na playlist "
-						+ playlistProcurada.getNome());
-
-				playlistProcurada.getMusicas().add(musicaEscolhida);
-				// salva no bd
-				try {
-					playlistDAO.adicionarMusica(musicaEscolhida, playlistProcurada);
-
-					System.out.println("Música adicionada com sucesso!");
-				} catch (Exception e) {
-					System.out.println("Erro ao salvar música: " + e.getMessage());
-				}
-				// ATUALIZA MEMÓRIA
-				ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
-
-			}
-			menuOuvinte();
-			break;
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		case 3: // seguir artista
-			System.out.println("Seguindo artista, " + artistaCriador.getNome());
-			artistaCriador.getFans().add(ouvinteLogado);
-
-			try {
-				ouvinteDAO.seguirArtista(ouvinteLogado, artistaCriador);
-				System.out.println("Artista seguido com sucesso!");
-			} catch (Exception e) {
-				System.out.println("Erro ao seguir artista: " + e.getMessage());
-			}
-
-			// COLOCAR ARTISTA NA LISTA DE SEGUINDOS DO OUVINTE!!!!!!!!!!!!!!!!!!!
-
-			menuOuvinte();
-			break;
-		case 0: // voltar ao menu
-			System.out.println("Voltando ao menu... ");
-			menuOuvinte();
-			break;
-		default:
-			System.out.println("Escolha inválida! Voltando ao menu... ");
-			menuOuvinte();
-			break;
-
-		}
-
-	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -2193,8 +2035,9 @@ public class Main {
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static boolean checarSeSeguidor(Ouvinte ouvinte, Ouvinte seguidor) {// valor booleano
-		List<Usuario> following = ouvinte.getFollowing();// checa se o seguidor está na lista de seguidos do ouvinte
+	public static boolean checarSeSeguidor(Ouvinte seguidor) {// valor booleano
+		List<Usuario> following = ouvinteLogado.getFollowing();// checa se o seguidor está na lista de seguidos do
+																// ouvinte
 		for (int i = 0; i < following.size(); i++) {
 			if (seguidor.getEmail().equals(following.get(i).getEmail())) {
 				return true;
@@ -2203,15 +2046,34 @@ public class Main {
 		return false;
 	}
 
-	public static void acoesSeguidores(Ouvinte ouvinte, Ouvinte seguidor) {
-		// seguir de volta somente
-		if (checarSeSeguidor(ouvinte, seguidor) == false) {
+	public static void acoesSeguidores(Ouvinte seguidor) {
+		System.out.println("=== Perfil de " + seguidor.getNome() + " ===");// informacoes do seguidor
+		System.out.println(seguidor.getPlaylists().size() + " Playlists");
+		System.out.println(seguidor.getFollowers().size() + " Seguidores");
+		System.out.println(seguidor.getFollowing().size() + " Seguindo");
+		System.out.println("---------------------------------");
+		if (checarSeSeguidor(seguidor) == false) {
 			System.out.println("Vocês são amigos! Seguem-se mutuamente!!");
-			System.out.println("Digite qualquer coisa para voltar:");
-			String voltar = scanner.next();
+			System.out.println("1) Deixar de Seguir");
+			System.out.println("0) Voltar");
+			int voltar = scanner.nextInt();
 			scanner.nextLine();
-			if (voltar.equals(voltar)) {
+			if (voltar == 1) {
+				System.out.println("Deixando de Seguir...");
+				try {
+					ouvinteDAO.unfollowOuvinte(seguidor, ouvinteLogado);
+					System.out.println("Deixou de Seguir!");
+					System.out.println("Voltando...");
+				} catch (Exception e) {
+					System.out.println("Não foi possível deixar de seguir pois: " + e.getMessage());
+				} finally {
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+				}
+			} else if (voltar == 0) {
 				System.out.println("Voltando...");
+			} else {
+				System.out.println("Opção Inválida");
+				acoesSeguidores(seguidor);
 			}
 		} else {
 			System.out.println("1) Seguir de Volta");
@@ -2220,16 +2082,90 @@ public class Main {
 			scanner.nextLine();
 			if (opcao == 1) {
 				try {
-					ouvinteDAO.seguirOuvinte(ouvinte, seguidor);
+					ouvinteDAO.seguirOuvinte(ouvinteLogado, seguidor);
+					System.out.println("Seguido com sucesso!");
+					System.out.println("Já pode aproveitar a sua amizade com " + seguidor.getNome());
 				} catch (Exception e) {
 					System.out.println("Não foi possível seguir pois: " + e.getMessage());
+				} finally {
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
 				}
 			} else if (opcao == 0) {
 				System.out.println("Voltando...");
 			} else {
 				System.out.println("Opção Inválida. Tente novamente!!");
-				acoesSeguidores(ouvinte, seguidor);
+				acoesSeguidores(seguidor);
 			}
 		}
 	}
+
+	public static void acoesSeguido(List<Usuario> seguidos) {
+		System.out.println("Digite o número do Seguido");
+		int seguido = scanner.nextInt();
+		scanner.nextLine();
+		Usuario seguidoProcurado = seguidos.get(seguido - 1);
+		if (ouvinteOuArtista(seguidoProcurado) == true) {
+			Artista artistaSeguido = artistaDAO.buscarArtistaPorEmail(seguidoProcurado.getEmail());
+			System.out.println("=== Artista " + artistaSeguido.getNome() + " ===");
+			System.out.println("  " + artistaSeguido.getFans().size() + " Fãs");
+			System.out.println("  " + artistaSeguido.getAlbuns().size() + " Álbuns");
+			System.out.println("  " + artistaSeguido.getAbout());
+			System.out.println("----------------------------------");
+			System.out.println("1) Deixar de Seguir");
+			System.out.println("0) Voltar");
+			int opcaoArtistaSeguido = scanner.nextInt();
+			scanner.nextLine();
+			switch (opcaoArtistaSeguido) {
+			case 1:
+				System.out.println("Deixando de Seguir...");
+				try {
+					ouvinteDAO.unfollowArtista(ouvinteLogado, artistaSeguido);
+					System.out.println("Deixou de Seguir!");
+					System.out.println("Voltando...");
+				} catch (Exception e) {
+					System.out.println("Não foi possível concluir: " + e.getMessage());
+				} finally {
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+				}
+				break;
+			case 0:
+				System.out.println("Voltando...");
+				break;
+
+			}
+		} else {
+			Ouvinte ouvinteSeguido = ouvinteDAO.buscarOuvintePorEmail(seguidoProcurado.getEmail());
+			System.out.println("=== Ouvinte " + ouvinteSeguido.getNome() + " ===");
+			System.out.println("  " + ouvinteSeguido.getFollowers().size() + " Seguidores");
+			System.out.println("  " + ouvinteSeguido.getFollowing().size() + " Seguindo");
+			System.out.println("  " + ouvinteSeguido.getPlaylists().size() + " Playlists");
+			System.out.println("----------------------------------");
+			System.out.println("1) Deixar de Seguir");
+			System.out.println("0) Voltar");
+			int opcaoOuvinteSeguido = scanner.nextInt();
+			scanner.nextLine();
+			switch (opcaoOuvinteSeguido) {
+			case 1:
+				System.out.println("Deixando de Seguir...");
+				try {
+					ouvinteDAO.unfollowOuvinte(ouvinteLogado, ouvinteSeguido);
+					System.out.println("Deixou de Seguir!");
+					System.out.println("Voltando...");
+				} catch (Exception e) {
+					System.out.println("Não foi possível concluir: " + e.getMessage());
+				} finally {
+					ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+				}
+				break;
+			case 0:
+				System.out.println("Voltando...");
+				break;
+			default:
+				System.out.println("Opção Inválida. Tente novamente");
+				acoesSeguido(seguidos);
+			}
+		}
+	}
+
 }
+///
