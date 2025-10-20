@@ -1093,7 +1093,7 @@ public class Main {
 			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		case 3: // BUSCAR MÚSICA
+		case 3: // BUSCAR MÚSICA inacabado, fzr
 			System.out.println("Insira o nome da música que procura: ");
 			String nomeMusica = scanner.nextLine();
 			List<Musica> musicasPuxadas = musicaDAO.buscarListaMusicaPorNome(nomeMusica);
@@ -1144,44 +1144,128 @@ public class Main {
 		case 5: // CRIAR PLAYLIST
 
 			// lista de músicas VAZIA
-			List<Musica> musicasPlaylist = new ArrayList<Musica>();
-			System.out.println("Criando a playlist! Yayy.");
-			System.out.println("Nome:");
-			String nomePlaylist = scanner.nextLine();
-			System.out.println("Bio:");
-			String bioPlaylist = scanner.nextLine();
-			System.out.println("Foto da capa:");
-			String fotoCapaURlPlaylist = scanner.nextLine();
+						List<Musica> musicasPlaylist = new ArrayList<Musica>();
+						System.out.println("Criando a playlist! Yayy.");
+						System.out.println("Nome:");
+						String nomePlaylist = scanner.nextLine();
+						System.out.println("Bio:");
+						String bioPlaylist = scanner.nextLine();
+						System.out.println("Foto da capa:");
+						String fotoCapaURlPlaylist = scanner.nextLine();
 
-			Playlist playlistCriada = new Playlist();
-			playlistCriada.setBio(bioPlaylist);
-			playlistCriada.setFotoDaCapaURL(fotoCapaURlPlaylist);
-			playlistCriada.setNome(nomePlaylist);
-			playlistCriada.setMusicas(musicasPlaylist);
-			playlistCriada.setIdOuvinte(ouvinteLogado.getIdOuvinte());
+						Playlist playlist = new Playlist();
+						playlist.setBio(bioPlaylist);
+						playlist.setFotoDaCapaURL(fotoCapaURlPlaylist);
+						playlist.setNome(nomePlaylist);
+						playlist.setMusicas(musicasPlaylist);
+						playlist.setIdOuvinte(ouvinteLogado.getIdOuvinte());
 
-			// salva no bd
-			try {
-				playlistDAO.salvar(playlistCriada);
-				System.out.println(
-						"Playlist cadastrada com suceso! Diga olá a sua nova playlist,  " + playlistCriada.getNome());
-			} catch (Exception e) {
-				System.out.println("Erro ao cadastrar playlist: " + e.getMessage());
-			}
-			// atualiza a memória
-			ouvinteLogado = atualizarOuvinte(ouvinteLogado);
+						// salva no bd
+						try {
+							playlistDAO.salvar(playlist);
+							System.out.println(
+									"Playlist cadastrada com suceso! Diga olá a sua nova playlist,  " + playlist.getNome());
+						} catch (Exception e) {
+							System.out.println("Erro ao cadastrar playlist: " + e.getMessage());
+						}
+						// ATUALIZA MEMÓRIA
+						ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
 
-			System.out.println("Adicionar músicas a playlist? (S/N)");
-			String escolhaAdicionarMusicas = scanner.nextLine();
-			if (escolhaAdicionarMusicas.equals("S")) {
+						System.out.println("Adicionar músicas a playlist? (S/N)");
+						String escolhaAdicionarMusicas = scanner.nextLine();
+						if (escolhaAdicionarMusicas.equals("S")) {
+							Playlist favoritas = ouvinteLogado.getPlaylistFavoritas(); 
+							int totalMusicas = favoritas.getMusicas().size();
+							int nroMusicaEscolhida = 0;
+							
+							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							if(favoritas.getMusicas().size()==0) {
+								System.out.println("Você não tem músicas favoritas... Para adicionar músicas em playlists criadas dê uma pesquisada em artistas, álbuns, ouvintes... Adicione sempre as músicas que gostar na favoritas e então adcione a na sua playlist!");
+							}  if (totalMusicas >5){
+								//mostra as últimas cinco adicionadas
+								System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
+								for (int i= 0; i<5; i++) {
+									System.out.println(i+1 +")");
+									System.out.println(favoritas.getMusicas().get(totalMusicas-i).getNome());
+									System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(totalMusicas-i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
+									
+								}
+								System.out.println("=============================="); 
+								
+								System.out.println("Mostrar todas? (S/N)"); 
+								String showAllFavoritas = scanner.nextLine(); 
+								//mostra todas
+								if(showAllFavoritas.equals("S")) {
+									System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
+									for (int i = 0; i<favoritas.getMusicas().size();i++) {
+										System.out.println(i+1 +")");
+										System.out.println(favoritas.getMusicas().get(i).getNome());
+										System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
+									}
+								} 
+								System.out.println("==============================");
+								
+								
+								
+							} else if (totalMusicas == 5) {
+								System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
+								for (int i =0; i<5; i++) {
+									System.out.println(i+1 +")");
+									System.out.println(favoritas.getMusicas().get(i).getNome());
+									System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
+										
+								}
+								System.out.println("==============================");
+							
+							} else if(totalMusicas<5) {
+								System.out.println("=====Suas MÚSICAS FAVORITAS:====="); 
+								for (int i = 0; i<favoritas.getMusicas().size();i++) {
+									System.out.println(i+1 +")");
+									System.out.println(favoritas.getMusicas().get(i).getNome());
+									System.out.println(artistaDAO.buscarPorIdArtista(albumDAO.buscarPorId(favoritas.getMusicas().get(i).getIdAlbum()).getIdArtista()).getNome()); //encontra o nome do artitsa pelo id do album que tem a música
+								}
+								System.out.println("==============================");
+						
+							}
 
-			} else if (escolhaAdicionarMusicas.equals("N")) {
+							///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+							
+							if(favoritas.getMusicas().size()==0) {
+								System.out.println("Você não tem músicas favoritas... Para adicionar músicas em playlists criadas dê uma pesquisada em artistas, álbuns, ouvintes... Adicione sempre as músicas que gostar na favoritas e então adcione a na sua playlist!");
+							} else {
+							int continuar =5;
+							do { 
+								System.out.println("Escolha uma música pelo número indicado: (para sair digite 0)");
+								nroMusicaEscolhida  = scanner.nextInt(); 
+								if(nroMusicaEscolhida==0) {
+									menuOuvinte(); 
+								}
+								
+								scanner.nextLine(); 
+								Musica musicaEscolhida = favoritas.getMusicas().get(nroMusicaEscolhida -1); 
+								playlist.getMusicas().add(musicaEscolhida); 
+								
+								try {
+									playlistDAO.adicionarMusica(musicaEscolhida, playlist);
+								} catch (Exception e) {
+									System.out.println("Erro ao salvar música: " + e.getMessage());
+								}
+								
+								// ATUALIZA MEMÓRIA
+								ouvinteLogado = ouvinteDAO.buscarPorIdOuvinte(ouvinteLogado.getIdOuvinte());
+								System.out.println("Continuar adicionando? (Digite qualquer coisa diferente de 0, para sair digite 0");
+								continuar = scanner.nextInt(); 
+								scanner.nextLine(); 
+								
+							}while(continuar!=0);
+						
+						
+						} }else if (escolhaAdicionarMusicas.equals("N")) {
+							System.out.println("Ok...Voltando!");
+						} else {
+							System.out.println("Escolha inválida. Voltando...");
+						}
 
-			} else {
-				System.out.println("Escolha inválida. Voltando...");
-			}
-
-			menuOuvinte();
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 6: // LISTAR PLAYLISTS (BIBLIOTECA + FAVS) ---- RETIFICAR
