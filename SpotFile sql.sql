@@ -84,11 +84,16 @@ ALTER TABLE playlist CHANGE nome nome VARCHAR(60) DEFAULT "MyPlaylist#0";
 ALTER TABLE seguidores CHANGE id_seguidores id_seguidor BIGINT NOT NULL;
 ALTER TABLE ouvinte CHANGE foto_de_perfil_url foto_de_perfil TEXT;
 ALTER TABLE artista CHANGE foto_de_perfil_url foto_de_perfil TEXT;
+ALTER TABLE seguidores CHANGE id_seguido id_seguido BIGINT NOT NULL;
 
 SELECT id_musica FROM musica WHERE id_album = ?;
-SELECT * FROM ouvinte WHERE nome LIKE '%a%';
-SELECT * FROM musica;
+SELECT * FROM artista;
+SELECT * FROM ouvinte;
+SELECT * FROM seguidores;
+SELECT * FROM fans;
+SELECT * FROM album;
 USE bd_spot_file;
+SET GLOBAL max_connections = 300;
 
 
 

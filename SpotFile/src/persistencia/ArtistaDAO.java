@@ -4,6 +4,7 @@ package persistencia;
 import model.Album;
 import model.Artista;
 import model.Ouvinte;
+import model.Usuario;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -228,6 +229,30 @@ public class ArtistaDAO {
 		return artista;
 	}
 
+	public Usuario buscarUsuarioArtista(long id_artista) {
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM ouvinte WHERE id_ouvinte = ?;";
+		Usuario artista = new Artista();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1,id_artista);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				String senha = rs.getString("senha");
+				String email = rs.getString("email");
+				String nome = rs.getString("nome");
+				artista.setNome(nome);
+				artista.setEmail(email);
+				artista.setSenha(senha);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return artista;
+	}
+	
 	public List<Artista> buscarListaArtistaPorNome(String nome) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM artista WHERE nome LIKE ?;";

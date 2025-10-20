@@ -218,7 +218,7 @@ public class OuvinteDAO {
 				ouvinte.setSenha(senha);
 				ouvinte.setFotoPerfil(fotoPerfil);
 				ouvinte.setPlaylistFavoritas(pDAO.buscarPlaylistFavoritasIdOuvinte(idOuvinte));
-				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));conexao.abrirConexao();
+				ouvinte.setPlaylists(pDAO.buscarListaPlaylistPorIdOuvinte(idOuvinte));
 				ouvinte.setFollowers(buscarSeguidores(idOuvinte));
 				ouvinte.setFollowing(buscarListaUsuarioSeguido(idOuvinte));
 			}
@@ -307,6 +307,30 @@ public class OuvinteDAO {
 		return seguidores;
 	}
 
+	public Usuario buscarUsuarioOuvinte(long id_ouvinte) {
+		conexao.abrirConexao();
+		String sql = "SELECT * FROM ouvinte WHERE id_ouvinte = ?;";
+		Usuario ouvinte = new Ouvinte();
+		try {
+			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
+			st.setLong(1,id_ouvinte);
+			ResultSet rs = st.executeQuery();
+			while(rs.next()) {
+				String senha = rs.getString("senha");
+				String email = rs.getString("email");
+				String nome = rs.getString("nome");
+				ouvinte.setNome(nome);
+				ouvinte.setEmail(email);
+				ouvinte.setSenha(senha);
+			}
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}finally {
+			conexao.fecharConexao();
+		}
+		return ouvinte;
+	}
+	
 	public List<Usuario> buscarListaUsuarioSeguido(long id_ouvinte) {
 		conexao.abrirConexao();
 		String sql = "SELECT * FROM seguidores WHERE id_seguidor = ?;";
@@ -318,16 +342,16 @@ public class OuvinteDAO {
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idSeguido = rs.getLong("id_seguido");
-				seguidos.add(buscarPorIdOuvinte(idSeguido));
+				seguidos.add(buscarUsuarioOuvinte(idSeguido));
 			}
 
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
 			st1.setLong(1, id_ouvinte);
 			ResultSet rs1 = st1.executeQuery();
 			while (rs1.next()) {
-				long idArtista = rs.getLong("id_artista");
+				long idArtista = rs1.getLong("id_artista");
 				ArtistaDAO atDAO = new ArtistaDAO();
-				seguidos.add(atDAO.buscarPorIdArtista(idArtista));
+				seguidos.add(atDAO.buscarUsuarioArtista(idArtista));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -356,7 +380,7 @@ public class OuvinteDAO {
 	// Seguir Artista
 	public void seguirArtista(Ouvinte ouvinte, Artista artista) {
 		conexao.abrirConexao();
-		String sql = "INSERT INTO fans (id_artista,id_seguidor) VALUES(?,?); ";
+		String sql = "INSERT INTO fans (id_artista,id_ouvinte) VALUES(?,?); ";
 		try {
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1, artista.getIdArtista());
