@@ -2,7 +2,9 @@
 package persistencia;
 
 import model.Artista;
+import model.Musica;
 import model.Ouvinte;
+import model.Playlist;
 import model.Usuario;
 
 import java.sql.PreparedStatement;
@@ -87,8 +89,19 @@ public class OuvinteDAO {
 		String sql1 = "DELETE FROM fans WHERE id_ouvinte = ?;";
 		String sql2 = "DELETE FROM seguidores WHERE id_seguido = ?;";
 		String sql3 = "DELETE FROM seguidores WHERE id_seguidor = ?;";
-		String sql4 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
+		String sql4 = "DELETE FROM salvo WHERE id_playlist = ?;";
+		String sql5 = "DELETE FROM ouvinte WHERE id_ouvinte = ?;";
 		try {
+			List<Playlist> playlists = ouvinte.getPlaylists();
+			for(Playlist playlist:playlists) {
+				List<Musica> musicas = playlist.getMusicas();
+				for(Musica musica:musicas) {
+					PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
+					st4.setLong(1, musica.getIdMusica());
+					st4.executeUpdate();
+				}
+			}
+			
 			PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 			st.setLong(1, ouvinte.getIdOuvinte());
 			st.executeUpdate();
@@ -105,9 +118,9 @@ public class OuvinteDAO {
 			st3.setLong(1, ouvinte.getIdOuvinte());
 			st3.executeUpdate();
 			
-			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
-			st4.setLong(1, ouvinte.getIdOuvinte());
-			st4.executeUpdate();
+			PreparedStatement st5 = conexao.getConexao().prepareStatement(sql5);
+			st5.setLong(1, ouvinte.getIdOuvinte());
+			st5.executeUpdate();
 			
 		} catch (SQLException e) {
 			e.printStackTrace();

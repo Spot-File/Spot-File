@@ -83,7 +83,6 @@ public abstract class Colecao {
 		
 		return (printarInfos); 
 		
-		
 	}
 	
 	

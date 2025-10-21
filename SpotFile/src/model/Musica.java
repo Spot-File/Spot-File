@@ -46,7 +46,32 @@ public class Musica {
 		this.idAlbum = idAlbum;
 	}
 
-	
+	public String printarInfos () {
+		String printarInfos;
+		int segs = getDuracaoMusica(); 
+		int mins = 0; 
+		int horas = 0; 
+		while (segs > 60) { 
+			mins ++; 
+			segs -= 60; 
+		}
+		while (mins > 60) {
+			horas ++; 
+			mins-=60;
+		}
+		if(horas>0) { 
+			printarInfos = horas + " horas e " + mins + " minutos"; 
+		} else if (mins>0) {
+			printarInfos =  mins + " minutos e " + segs + " segundos"; 
+		} else if (mins==0 && horas ==0) {
+			printarInfos =  segs + " segundos";
+		} else {
+			printarInfos =  segs + " segundos!"; //nao dar ponto de exclamação
+		}
+		
+		return (printarInfos); 
+		
+	}
 	
 	
 	

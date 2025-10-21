@@ -95,7 +95,8 @@ SELECT * FROM album;
 USE bd_spot_file;
 SET GLOBAL max_connections = 300;
 
-
+TRUNCATE TABLE ouvinte;
+DELETE FROM ouvinte;
 
 -- formato de INSERTS
 -- INSERT INTO artista (email,senha,nome,about,foto_de_perfil_url) VALUES(?,?,?,?,?); 

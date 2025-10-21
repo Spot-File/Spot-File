@@ -3,6 +3,7 @@ package persistencia;
 
 import model.Album;
 import model.Artista;
+import model.Musica;
 import model.Ouvinte;
 import model.Usuario;
 
@@ -81,15 +82,14 @@ public class ArtistaDAO {
 		String sql = "DELETE FROM musica WHERE id_album = ?;";
 		String sql1 = "DELETE FROM album WHERE id_artista = ?;";
 		String sql2 = "DELETE FROM fans WHERE id_artista = ?;";
-		String sql3 = "DELETE FROM artista WHERE id_artista = ?;";
+		String sql3 = "DELETE FROM salvo WHERE id_musica = ?;";
+		String sql4 = "DELETE FROM artista WHERE id_artista = ?;";
 		try {
 			
 			for (Album album : buscarListaAlbumPorIdArtista(artista.getIdArtista())) {
-				conexao.abrirConexao();
 				PreparedStatement st = conexao.getConexao().prepareStatement(sql);
 				st.setLong(1, album.getIdAlbum());
 				st.executeUpdate();
-				st.close();
 			}
 
 			PreparedStatement st1 = conexao.getConexao().prepareStatement(sql1);
@@ -99,10 +99,20 @@ public class ArtistaDAO {
 			PreparedStatement st2 = conexao.getConexao().prepareStatement(sql2);
 			st2.setLong(1, artista.getIdArtista());
 			st2.executeUpdate();
-
-			PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
-			st3.setLong(1, artista.getIdArtista());
-			st3.executeUpdate();
+			
+			List<Album> albuns = artista.getAlbuns();
+			for(Album album:albuns) {
+				List<Musica> musicas = album.getMusicas();
+				for(Musica musica:musicas) {
+					PreparedStatement st3 = conexao.getConexao().prepareStatement(sql3);
+					st3.setLong(1, musica.getIdMusica());
+					st3.executeUpdate();
+				}
+			}
+			
+			PreparedStatement st4 = conexao.getConexao().prepareStatement(sql4);
+			st4.setLong(1, artista.getIdArtista());
+			st4.executeUpdate();
 		}catch(SQLException e) {
 			e.printStackTrace();
 		}finally {

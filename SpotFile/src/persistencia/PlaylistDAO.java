@@ -273,10 +273,8 @@ public class PlaylistDAO {
 			ResultSet rs = st.executeQuery();
 			while (rs.next()) {
 				long idMusica = rs.getLong("id_musica");
-				String nome = rs.getString("nome");
-				int duracao = rs.getInt("duracao");
-				long idAlbum = rs.getLong("id_album");
-				Musica musica = new Musica(idMusica, nome, duracao, idAlbum);
+				MusicaDAO musicaDAO = new MusicaDAO();
+				Musica musica = musicaDAO.buscarPorId(idMusica);
 				musicas.add(musica);
 			}
 		} catch (SQLException e) {
