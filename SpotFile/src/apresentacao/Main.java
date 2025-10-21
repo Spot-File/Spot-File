@@ -1265,6 +1265,7 @@ public class Main {
 						} else {
 							System.out.println("Escolha inválida. Voltando...");
 						}
+						menuOuvinte(); 
 
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1487,7 +1488,76 @@ public class Main {
 			break;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		case 10: // ATUALIZAR PLAYLIST & add musica
-			// FAZER LOGO :_)
+			
+			//visualizar as playlists
+			
+			System.out.println("=== SUA BIBLIOTECA ===");
+			List<Playlist> bibliotecaOuvinte = ouvinteLogado.getPlaylists(); // pega as playlists do ouvinte
+			if (bibliotecaOuvinte.isEmpty() || bibliotecaOuvinte == null) { // testa se não é vazia
+				System.out.println("No momento não tens nenhuma playlist");
+				System.out.println("Aproveite a oportunidade para criar uma!");
+				System.out.println("Voltando ao Menu...");
+				break;
+			} else {
+				
+				if (bibliotecaOuvinte.size()> 5) {
+					for( int i =0; i<5; i++) { //mostra as cinco primeiras
+					System.out.println(i +1 + ")"); 
+					System.out.println(bibliotecaOuvinte.get(i).getNome()); 
+					}
+					System.out.println("Mostrar todas? (S/N)"); 
+					String escolhaContinuar = scanner.nextLine(); 
+					
+					if(escolhaContinuar.equals("S")) {
+						for( int i =0; i<bibliotecaOuvinte.size(); i++) { //mostra todas as playlists
+							System.out.println(i +1 + ")"); 
+							System.out.println(bibliotecaOuvinte.get(i).getNome()); 
+							}	
+					}
+					System.out.println("Escolha a playlist que deseja editar pelo número indicado:"); 
+					int escolhaPlaylistEditar = scanner.nextInt(); 
+					scanner.nextLine(); 
+					Playlist playlistEditar = bibliotecaOuvinte.get(escolhaPlaylistEditar); 
+					editarPlaylist(playlistEditar); 
+					
+					//editar playlist metodo
+					
+				} else if (bibliotecaOuvinte.size() ==5) {
+					for( int i =0; i<5; i++) { 
+						System.out.println(i +1 + ")"); 
+						System.out.println(bibliotecaOuvinte.get(i).getNome()); 
+						}
+					System.out.println("Escolha a playlist que deseja editar pelo número indicado:"); 
+					int escolhaPlaylistEditar = scanner.nextInt(); 
+					scanner.nextLine(); 
+					Playlist playlistEditar = bibliotecaOuvinte.get(escolhaPlaylistEditar); 
+					editarPlaylist(playlistEditar); 
+					
+				}else if (bibliotecaOuvinte.size()<5) {
+					for( int i =0; i<bibliotecaOuvinte.size(); i++) { 
+						System.out.println(i +1 + ")"); 
+						System.out.println(bibliotecaOuvinte.get(i).getNome()); 
+						}	
+					System.out.println("Escolha a playlist que deseja editar pelo número indicado:"); 
+					int escolhaPlaylistEditar = scanner.nextInt(); 
+					scanner.nextLine(); 
+					Playlist playlistEditar = bibliotecaOuvinte.get(escolhaPlaylistEditar-1); 
+					editarPlaylist(playlistEditar); 
+				}
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 			menuOuvinte();
 			break;
@@ -1983,7 +2053,7 @@ public class Main {
 	
 	public static void acessoAlbum(Album album) {
 		System.out.println("--- " + album.getNome() +" ---");
-		System.out.println("Artista: " + artistaDAO.buscarPorIdArtista(album.getIdArtista()));
+		System.out.println("Artista: " + artistaDAO.buscarPorIdArtista(album.getIdArtista()).getNome());
 		System.out.println(album.printarInfos());
 		System.out.println("Músicas:");
 		verMusicas(album);
@@ -2505,7 +2575,59 @@ public class Main {
 			}
 		} while (opcaoVoltar != 0);
 	}
-
+	
+	public static void editarPlaylist(Playlist playlistEditar) { 
+		int escolhaEdicaoPlaylist = 10; 
+		do {
+			System.out.println("Insira o que desejas editar em em sua playlist, " + playlistEditar.getNome()); 
+			System.out.println("1)Nome"); 
+			System.out.println("2)Bio");
+			System.out.println("3)Foto da capa");
+			System.out.println("4)Adicionar músicas");
+			System.out.println("0)Voltar"); 
+			 escolhaEdicaoPlaylist = scanner.nextInt(); 
+			scanner.nextLine();
+			switch (escolhaEdicaoPlaylist) {
+			case 1:
+				System.out.println("Nome atual: " + playlistEditar.getNome());
+				System.out.println("Nome novo: ");
+				String nomeNovo = scanner.next();
+				scanner.nextLine();
+				playlistEditar.setNome(nomeNovo);// altera nome e manda para o bd
+				playlistDAO.editar(playlistEditar);
+				break;
+			case 2:
+				System.out.println("Bio atual: " + playlistEditar.getBio());
+				System.out.println("Bio nova: ");
+				String bioNova = scanner.next();
+				scanner.nextLine();
+				playlistEditar.setBio(bioNova);// altera bio e manda para o bd
+				playlistDAO.editar(playlistEditar);
+				break;
+			case 3:
+				System.out.println("Foto atual: " + playlistEditar.getFotoDaCapaURL());
+				System.out.println("Foto nova: ");
+				String fotoNova = scanner.next();
+				scanner.nextLine();
+				playlistEditar.setFotoDaCapaURL(fotoNova);// altera foto no bd
+				playlistDAO.editar(playlistEditar);
+				break;
+			case 4: 
+				break; 
+			
+			
+			case 0:
+				System.out.println("Voltando...");
+				break;
+			default:
+				System.out.println("Opção Inválida!");
+				System.out.println("Voltando à Playlist...");
+			
+			break;
+			}
+		} while (escolhaEdicaoPlaylist!=0);
+		}
+		
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// CHECAR SE OUVINTE OU ARTISTA
 	public static boolean ouvinteOuArtista(Usuario usuario) {
